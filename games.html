@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<!--
+  TODO: Out of scope for this pass (reserved for future larger missions):
+  1. Sound & Song Recall (requires regional audio assets & folk song recordings)
+  2. Family Voice Recognition (requires recording infrastructure & clinician consent workflow)
+  3. Play Together / Multiplayer Mode (requires WebSocket room orchestration & multi-touch tablet UI)
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>NeuroSync | Patient Companion &amp; Daily Cognitive Care</title>
+  <meta name="description" content="Gentle cognitive engagement and daily activities for the NeuroSync Tele-Cognitive Care Network · GMCH Regional Memory Unit.">
+
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <!-- Shared design tokens FIRST, then patient overrides -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/games.css">
+</head>
+<body>
+<div class="game-shell" id="game-shell">
+
+  <!-- ═══════════════════════════════════════════════
+       PERSISTENT HEADER (CALM, CLEAN, DEMENTIA-FRIENDLY)
+       ═══════════════════════════════════════════════ -->
+  <header class="game-header" role="banner">
+    <div class="game-header-logo">
+      <button type="button" id="btn-toggle-companion-sidebar" class="btn-clinical-menu-trigger" aria-haspopup="dialog" aria-expanded="false" aria-controls="companion-sidebar" aria-label="Open Companion Navigation Menu" title="Open Companion Navigation Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <span>Menu</span>
+      </button>
+      <a href="/landing.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;" title="NeuroSync Home">
+        <!-- Official NeuroSync Emblem Image (Without Text) -->
+        <img src="/assets/logo.png" alt="NeuroSync Logo" class="brand-logo-img" width="34" height="34">
+        <div>
+          <div class="game-header-title">NeuroSync · Companion Care</div>
+          <div class="game-header-subtitle">GMCH Regional Memory Unit · Patient Portal</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Calm Patient Name Pill (Without Dropdown Arrow) -->
+    <div class="patient-name-display-pill" id="patient-name-display-pill" title="Active Patient Profile">
+      <span class="pill-label">Patient:</span>
+      <span id="patient-display-name-text" class="pill-value">Loading…</span>
+      <!-- Hidden select preserved for script & test compatibility -->
+      <select id="game-patient-select" style="display: none;" aria-hidden="true"></select>
+    </div>
+
+    <!-- Header Actions -->
+    <div style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+      <!-- Mute / Unmute Audio Guidance Toggle Button -->
+      <button type="button" id="btn-toggle-audio-mute" class="btn-mute-toggle" aria-label="Mute audio guidance" title="Toggle audio voice prompts" aria-pressed="false">
+        <span class="mute-icon-unmuted" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        </span>
+        <span class="mute-icon-muted" aria-hidden="true" style="display: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </span>
+        <span class="mute-label-text" id="mute-label-text">Sound: On</span>
+      </button>
+
+      <!-- Profile Option (Renamed & Interactive to Edit Profile) -->
+      <button id="btn-open-patient-profile" class="patient-profile-header-btn" aria-label="Open Patient Profile" title="Click to view and edit profile details">
+        <div class="patient-profile-header-text">
+          <span class="patient-profile-badge-tag">Profile</span>
+          <span class="patient-profile-name" id="header-patient-name">—</span>
+          <span id="header-patient-id" style="display: none;"></span>
+        </div>
+        <div class="patient-avatar-ring" id="header-patient-avatar">?</div>
+      </button>
+
+      <!-- Deprecated Caregiver View removed from UI (hidden div for test suite safety) -->
+      <div id="btn-to-clinician-dashboard" style="display: none;" aria-hidden="true"></div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       ENCOURAGEMENT TOAST
+       ═══════════════════════════════════════════════ -->
+  <div class="encourage-toast" id="encourage-toast" role="status" aria-live="polite"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       MAIN VIEWPORT
+       ═══════════════════════════════════════════════ -->
+  <main class="game-main" role="main">
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: PATIENT NOT FOUND
+         ───────────────────────────────────────────── -->
+    <div id="view-not-found" class="game-view">
+      <div style="text-align:center; padding:60px 24px;">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" style="margin:0 auto 20px; display:block;">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
+        </svg>
+        <h1 style="font-family:var(--font-heading); color:var(--color-brand-primary); margin-bottom:10px;">Patient ID required</h1>
+        <p style="color:var(--color-text-secondary); max-width:420px; margin:0 auto; line-height:1.6;">
+          Please open this page with a valid patient link, for example:<br>
+          <code style="font-family:var(--font-mono); font-size:0.875rem; background:var(--color-surface-subtle); padding:4px 8px; border-radius:3px; display:inline-block; margin-top:8px;">
+            /games.html?patient=NER-2024-081
+          </code>
+        </p>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW 1: PATIENT TODAY DASHBOARD (PRIMARY ORIENTATION VIEW)
+         Grounding, calm, large readable text, voice guidance
+         ───────────────────────────────────────────── -->
+    <div id="view-dashboard" class="game-view active">
+      <div class="patient-dashboard-grid">
+
+        <!-- Orientation Hero Strip: Live Clock, Date, Weather & Audio Guidance -->
+        <div class="patient-orientation-card">
+          <div class="orientation-time-block">
+            <div class="orientation-live-clock" id="patient-live-clock" aria-live="off">--:-- --</div>
+            <div class="orientation-full-date" id="patient-full-date">Loading Today's Date...</div>
+            <div class="orientation-weather-chip" id="patient-weather-chip" aria-label="Current calm weather">
+              <span>🌤️</span>
+              <span id="patient-weather-text">Guwahati · 24°C · Pleasant &amp; Mild Breeze</span>
+            </div>
+          </div>
+          <div class="orientation-actions">
+            <button class="btn-audio-guidance" id="btn-read-today-schedule" aria-label="Listen to today's schedule and orientation">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              </svg>
+              <span>Listen to Today's Guidance</span>
+            </button>
+            <span style="font-size: 0.8125rem; color: var(--color-text-secondary);">Voice guidance in English, Assamese, Hindi &amp; Bengali</span>
+          </div>
+        </div>
+
+        <!-- 2-Column Row 1: Mood Check-In & Daily Grounding Question -->
+        <div class="dashboard-sections-row">
+          
+          <!-- Daily Mood Check-In Card -->
+          <div class="patient-card" id="card-mood-checkin">
+            <div class="patient-card-header">
+              <div>
+                <h2 class="patient-card-title">
+                  <span>🌸</span>
+                  <span>Daily Mood Check-In</span>
+                </h2>
+                <div class="patient-card-subtitle">How are you feeling right now? There is no rush.</div>
+              </div>
+              <button class="btn-audio-prompt" id="btn-audio-mood" aria-label="Hear mood check-in prompt">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              </button>
+            </div>
+            
+            <div class="mood-buttons-grid" role="group" aria-label="Select current mood">
+              <button class="btn-mood-choice" data-mood="happy" data-label="Happy &amp; Bright" aria-label="Feeling happy and bright">
+                <span class="mood-emoji">😊</span>
+                <span class="mood-label">Happy</span>
+              </button>
+              <button class="btn-mood-choice" data-mood="calm" data-label="Calm &amp; Peaceful" aria-label="Feeling calm and peaceful">
+                <span class="mood-emoji">😌</span>
+                <span class="mood-label">Peaceful</span>
+              </button>
+              <button class="btn-mood-choice" data-mood="tired" data-label="A Little Tired" aria-label="Feeling a little tired">
+                <span class="mood-emoji">🥱</span>
+                <span class="mood-label">Tired</span>
+              </button>
+              <button class="btn-mood-choice" data-mood="anxious" data-label="Need Comfort" aria-label="Need comfort or help">
+                <span class="mood-emoji">😟</span>
+                <span class="mood-label">Need Help</span>
+              </button>
+            </div>
+
+            <div id="mood-feedback-banner" class="mood-feedback-banner" style="display: none;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span id="mood-feedback-text">Thank you for sharing. We're right here with you!</span>
+            </div>
+          </div>
+
+          <!-- Daily Grounding Question Card -->
+          <div class="patient-card" id="card-daily-question">
+            <div class="patient-card-header">
+              <div>
+                <h2 class="patient-card-title">
+                  <span>💡</span>
+                  <span>Daily Gentle Question</span>
+                </h2>
+                <div class="patient-card-subtitle">Take all the time you need. No pressure.</div>
+              </div>
+              <button class="btn-audio-prompt" id="btn-audio-question" aria-label="Hear daily question aloud">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              </button>
+            </div>
+
+            <div class="daily-question-container">
+              <div class="daily-question-prompt" id="daily-question-prompt">Loading question...</div>
+              <div class="daily-question-options" id="daily-question-options" role="group" aria-label="Question choices">
+                <!-- Injected via JavaScript -->
+              </div>
+              <div id="daily-question-feedback" class="mood-feedback-banner" style="display: none; margin-top: 12px;">
+                <span id="daily-question-feedback-text">Wonderful!</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 2-Column Row 2: Upcoming Medications & Important Contacts / Safe Zone -->
+        <div class="dashboard-sections-row">
+          
+          <!-- Upcoming Medications Card -->
+          <div class="patient-card">
+            <div class="patient-card-header">
+              <div>
+                <h2 class="patient-card-title">
+                  <span>💊</span>
+                  <span>Today's Care &amp; Medication</span>
+                </h2>
+                <div class="patient-card-subtitle">Scheduled doses &amp; reminders for today</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <button id="btn-dashboard-view-calendar" class="btn-text-subtle" style="font-size: 0.8125rem; color: var(--color-brand-primary); font-weight: 600; cursor: pointer; background: none; border: none; text-decoration: underline;">
+                  📅 Activity Calendar &rarr;
+                </button>
+                <button id="btn-dashboard-view-all-meds" class="btn-text-subtle" style="font-size: 0.8125rem; color: var(--color-brand-primary); font-weight: 600; cursor: pointer; background: none; border: none; text-decoration: underline;">
+                  Schedule &rarr;
+                </button>
+              </div>
+            </div>
+
+            <div class="med-cards-stack" id="dashboard-meds-stack">
+              <!-- Dynamically populated via _renderPatientDashboard() -->
+            </div>
+          </div>
+
+          <!-- Contacts & Safety Card -->
+          <div class="patient-card">
+            <div class="patient-card-header">
+              <div>
+                <h2 class="patient-card-title">
+                  <span>🛡️</span>
+                  <span>Important Contacts &amp; Safety</span>
+                </h2>
+                <div class="patient-card-subtitle">One-tap assistance from family and clinicians</div>
+              </div>
+            </div>
+
+            <div class="contacts-grid" id="patient-contacts-grid">
+              <!-- Injected via JavaScript with Caregiver, Doctor, ASHA Worker -->
+            </div>
+
+            <!-- Safe-Zone Telemetry Status -->
+            <div class="safezone-card" style="margin-top: 16px;">
+              <div>
+                <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: #2D7A58; font-weight: 700; margin-bottom: 2px;">
+                  Safety Zone Status
+                </div>
+                <div style="font-size: 0.9375rem; font-weight: 600; color: var(--color-text-primary);" id="dashboard-safezone-title">
+                  Inside Home Residence (Kamrup)
+                </div>
+                <div style="font-size: 0.75rem; color: var(--color-text-secondary);" id="dashboard-safezone-meta">
+                  Geo-Fence radius 200m active · Cellular telemetry encrypted for privacy
+                </div>
+              </div>
+              <span class="safezone-status-pill">
+                <span class="safezone-pulse-dot"></span>
+                <span>Protected</span>
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Brain Activities Quick Launcher Banner -->
+        <div class="activities-promo-banner">
+          <div>
+            <div style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9;">Daily Brain Stimulation</div>
+            <div style="font-family: var(--font-heading); font-size: 1.375rem; font-weight: 600; margin-top: 2px;">
+              Ready for your gentle memory exercises today?
+            </div>
+            <div style="font-size: 0.875rem; opacity: 0.9; margin-top: 4px;">
+              Choose from Memory Match, Daily Routine, Spot the Difference, and Family Photos.
+            </div>
+          </div>
+          <button id="btn-promo-go-activities" class="promo-btn-cta">
+            <span>Open Brain Activities &rarr;</span>
+          </button>
+        </div>
+
+      </div><!-- /patient-dashboard-grid -->
+    </div><!-- /view-dashboard -->
+
+    <!-- ─────────────────────────────────────────────
+         VIEW 2: FULL MEDICATIONS & REMINDERS LIST
+         ───────────────────────────────────────────── -->
+    <div id="view-reminders" class="game-view">
+      <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <h1 style="font-family: var(--font-heading); font-size: 1.75rem; color: var(--color-text-primary);">
+            Today's Care &amp; Medication Schedule
+          </h1>
+          <p style="color: var(--color-text-secondary); font-size: 0.9375rem; margin-top: 4px;">
+            Here are all your scheduled medicines and daily care reminders. Take your time.
+          </p>
+        </div>
+        <button id="btn-back-to-dashboard-from-rem" class="btn-take-a-break">
+          <span>&larr; Back to Dashboard</span>
+        </button>
+      </div>
+
+      <div class="med-cards-stack" id="full-reminders-stack">
+        <!-- Injected via _renderRemindersView() -->
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: ACTIVITY CALENDAR & DAILY HEALTH RECORDS
+         ───────────────────────────────────────────── -->
+    <div id="view-calendar" class="game-view">
+      <div style="margin-bottom: 20px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span class="view-tag-chip">📅 Longitudinal Activity Log</span>
+            <span class="view-tag-chip" style="background: rgba(16, 185, 129, 0.12); color: #059669; border-color: rgba(16, 185, 129, 0.25);">Auto-Syncs with Care Plan</span>
+          </div>
+          <h1 style="font-family: var(--font-display); font-size: 1.625rem; font-weight: 700; color: var(--color-text-primary); margin: 0; display: flex; align-items: center; gap: 10px;">
+            <span>Daily Activity &amp; Care Calendar</span>
+          </h1>
+          <p style="color: var(--color-text-secondary); font-size: 0.9375rem; margin-top: 4px;">
+            Review daily records of medicines taken, cognitive exercises completed, mood checks, and care routines.
+          </p>
+        </div>
+        <button id="btn-back-to-dashboard-from-cal" class="btn-take-a-break">
+          <span>&larr; Back to Dashboard</span>
+        </button>
+      </div>
+
+      <!-- Calendar Two-Column Layout -->
+      <div class="patient-calendar-layout">
+        <!-- Left: Interactive Month Calendar -->
+        <div class="calendar-card-panel">
+          <!-- Calendar Month Navigation Controls -->
+          <div class="calendar-controls-bar">
+            <div class="calendar-month-display">
+              <span id="cal-month-name" class="cal-month-title">September 2026</span>
+            </div>
+            <div class="cal-nav-buttons">
+              <button type="button" id="btn-cal-prev" class="cal-btn-nav" aria-label="Previous Month">&larr; Prev</button>
+              <button type="button" id="btn-cal-today" class="cal-btn-today" aria-label="Go to Today">Today</button>
+              <button type="button" id="btn-cal-next" class="cal-btn-nav" aria-label="Next Month">Next &rarr;</button>
+            </div>
+          </div>
+
+          <!-- Weekday Headers -->
+          <div class="calendar-weekdays-row">
+            <span>Sun</span>
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+          </div>
+
+          <!-- Calendar Grid Days -->
+          <div id="calendar-days-grid" class="calendar-days-grid">
+            <!-- Rendered dynamically via _renderActivityCalendar() -->
+          </div>
+
+          <!-- Calendar Legend -->
+          <div class="calendar-legend-bar">
+            <div class="legend-item"><span class="leg-dot dot-med"></span><span>Medicines Taken</span></div>
+            <div class="legend-item"><span class="leg-dot dot-game"></span><span>Brain Activity</span></div>
+            <div class="legend-item"><span class="leg-dot dot-mood"></span><span>Mood Check-In</span></div>
+            <div class="legend-item"><span class="leg-dot dot-routine"></span><span>Routine / Care</span></div>
+          </div>
+        </div>
+
+        <!-- Right: Selected Day Inspector & Timeline -->
+        <div class="calendar-day-inspector-panel">
+          <div class="inspector-header">
+            <div class="inspector-date-box">
+              <div class="inspector-badge" id="inspector-day-badge">Selected Day</div>
+              <h3 id="inspector-date-heading" class="inspector-date-heading">Today</h3>
+            </div>
+            <div class="inspector-tally-pill" id="inspector-tally-pill">
+              <span id="inspector-tally-count">0</span> Activities
+            </div>
+          </div>
+
+          <!-- Day Tally Cards -->
+          <div class="inspector-stats-row">
+            <div class="inspector-mini-stat">
+              <span class="stat-emoji">💊</span>
+              <div class="stat-info">
+                <span class="stat-num" id="inspector-stat-meds">0</span>
+                <span class="stat-lbl">Meds Taken</span>
+              </div>
+            </div>
+            <div class="inspector-mini-stat">
+              <span class="stat-emoji">🧠</span>
+              <div class="stat-info">
+                <span class="stat-num" id="inspector-stat-games">0</span>
+                <span class="stat-lbl">Brain Games</span>
+              </div>
+            </div>
+            <div class="inspector-mini-stat">
+              <span class="stat-emoji">😊</span>
+              <div class="stat-info">
+                <span class="stat-num" id="inspector-stat-mood">0</span>
+                <span class="stat-lbl">Mood Logs</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline of Activities for that Day -->
+          <div class="inspector-timeline-section">
+            <div class="inspector-section-label">RECORDED ACTIVITIES FOR THIS DAY</div>
+            <div id="inspector-activities-list" class="inspector-activities-list">
+              <!-- Dynamically populated via _renderDayInspector() -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW 3: BRAIN ACTIVITIES / GAMES HOME
+         ───────────────────────────────────────────── -->
+    <div id="view-home" class="game-view">
+      <div style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div class="welcome-greeting" id="welcome-greeting">Hello!</div>
+          <div class="welcome-subtitle">
+            Ready for your brain exercises today? Choose one game to start.<br>
+            <span style="font-size:0.875rem; color:var(--color-text-muted);">Take your time — there is no rush. Stop whenever you wish.</span>
+          </div>
+        </div>
+        <button id="btn-back-to-dashboard-from-games" class="btn-take-a-break">
+          <span>&larr; Back to Dashboard</span>
+        </button>
+      </div>
+
+      <!-- Audio welcome button -->
+      <div style="margin-bottom:24px;">
+        <button class="btn-audio-prompt" id="btn-welcome-audio" aria-label="Hear welcome message again">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          <span>Hear instructions</span>
+        </button>
+      </div>
+
+      <!-- Active Daily Reminder Banner (One-Tap Access) -->
+      <div id="home-due-reminder-banner" class="home-due-reminder-banner" role="button" tabindex="0" aria-label="Open scheduled daily reminder">
+        <div class="reminder-banner-content">
+          <div class="reminder-banner-icon" id="home-banner-icon">💊</div>
+          <div>
+            <div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-brand-primary); font-weight: 700;" id="home-banner-meta">Daily Care Schedule · Scheduled for 08:30 AM</div>
+            <div style="font-family: var(--font-heading); font-size: 1.125rem; font-weight: 600; color: var(--color-text-primary);" id="home-banner-title">Donepezil 10mg — Morning Dose</div>
+            <div style="font-size: 0.8125rem; color: var(--color-text-secondary);" id="home-banner-desc">Take 1 tablet after morning meal with warm water</div>
+          </div>
+        </div>
+        <div class="reminder-banner-cta">
+          <span>Open Reminder &rarr;</span>
+        </div>
+      </div>
+
+      <!-- CST Reality Orientation Board ("Today" board) -->
+      <div id="orientation-board-container"></div>
+
+      <!-- Game selection cards -->
+      <div class="game-cards-grid" id="game-cards-grid">
+
+        <!-- Game 1: Memory Match -->
+        <div class="game-card" id="card-memory" tabindex="0" role="button" aria-label="Play Memory Match">
+          <div class="game-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <rect x="2" y="2" width="9" height="9" rx="2"/><rect x="13" y="2" width="9" height="9" rx="2"/>
+              <rect x="2" y="13" width="9" height="9" rx="2"/><rect x="13" y="13" width="9" height="9" rx="2"/>
+            </svg>
+          </div>
+          <div class="game-card-name">Memory Match</div>
+          <div class="game-card-desc">Flip cards and find matching pairs of familiar objects.</div>
+          <div class="game-card-difficulty" id="diff-memory">Adapts to your level</div>
+        </div>
+
+        <!-- Game 2: Daily Routine -->
+        <div class="game-card" id="card-routine" tabindex="0" role="button" aria-label="Play Daily Routine Sequencer">
+          <div class="game-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <path d="M8 6h13M8 12h13M8 18h13M3 6l.01 0M3 12l.01 0M3 18l.01 0"/>
+            </svg>
+          </div>
+          <div class="game-card-name">Daily Routine</div>
+          <div class="game-card-desc">Arrange the activities of a day from morning to night.</div>
+          <div class="game-card-difficulty" id="diff-routine">Adapts to your level</div>
+        </div>
+
+        <!-- Game 3: Attention Spotter -->
+        <div class="game-card" id="card-attention" tabindex="0" role="button" aria-label="Play Attention Spotter">
+          <div class="game-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+              <circle cx="11" cy="11" r="3"/>
+            </svg>
+          </div>
+          <div class="game-card-name">Spot the Difference</div>
+          <div class="game-card-desc">Look at two pictures and tap what is different between them.</div>
+          <div class="game-card-difficulty" id="diff-attention">Adapts to your level</div>
+        </div>
+
+        <!-- Game 4: Pattern Sort -->
+        <div class="game-card" id="card-pattern" tabindex="0" role="button" aria-label="Play Pattern Sort">
+          <div class="game-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <path d="M3 6h18M3 12h9m-9 6h6"/>
+              <circle cx="18" cy="12" r="3"/><circle cx="15" cy="18" r="3"/>
+            </svg>
+          </div>
+          <div class="game-card-name">Sort & Group</div>
+          <div class="game-card-desc">Sort objects into the right groups — fruits, vegetables, and more.</div>
+          <div class="game-card-difficulty" id="diff-pattern">Adapts to your level</div>
+        </div>
+
+        <!-- Game 5: Reminiscence Recall -->
+        <div class="game-card" id="card-reminiscence" tabindex="0" role="button" aria-label="Play Reminiscence Recall">
+          <div class="game-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="game-card-name">Who Is This?</div>
+          <div class="game-card-desc">Look at family photos and remember who each person is.</div>
+          <div class="game-card-difficulty" id="diff-reminiscence">Adapts to your level</div>
+        </div>
+
+        <!-- Game 6: Sort It Out (CST Categorization) -->
+        <div class="game-card" id="card-categorize" tabindex="0" role="button" aria-label="Play Sort It Out Categorization">
+          <div class="game-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7m-3.5-3.5v7"/>
+            </svg>
+          </div>
+          <div class="game-card-name">Sort It Out</div>
+          <div class="game-card-desc">Sort familiar local fruits and vegetables into the right groups.</div>
+          <div class="game-card-difficulty" id="diff-categorize">Adapts to your level</div>
+        </div>
+
+      </div><!-- /game-cards-grid -->
+    </div><!-- /view-home -->
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: MEMORY MATCH
+         ───────────────────────────────────────────── -->
+    <div id="view-memory" class="game-view">
+      <div class="ingame-topbar">
+        <div>
+          <div class="ingame-title">Memory Match</div>
+          <div class="ingame-instructions">Tap two cards to flip them. Find all the matching pairs.</div>
+        </div>
+        <button class="btn-back-home" id="back-home-memory" aria-label="Return to game menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Games Menu
+        </button>
+      </div>
+
+      <div class="d-flex align-center" style="gap:12px; margin-bottom:8px;">
+        <button class="btn-audio-prompt" onclick="GameAudio.speak('memoryMatch')" style="font-size:0.8125rem; padding:8px 14px; min-height:40px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          Hear instructions
+        </button>
+      </div>
+
+      <div class="soft-progress-container">
+        <div class="soft-progress-track">
+          <div class="soft-progress-fill" id="memory-progress-fill"></div>
+        </div>
+        <div class="soft-progress-label" id="memory-progress-label">0 pairs found</div>
+      </div>
+
+      <div class="memory-grid" id="memory-grid" role="list" aria-label="Memory card grid"
+           style="margin: 16px auto;"></div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: DAILY ROUTINE SEQUENCER
+         ───────────────────────────────────────────── -->
+    <div id="view-routine" class="game-view">
+      <div class="ingame-topbar">
+        <div>
+          <div class="ingame-title">Daily Routine</div>
+          <div class="ingame-instructions">Tap a card, then tap the step number where it belongs.</div>
+        </div>
+        <button class="btn-back-home" id="back-home-routine">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Games Menu
+        </button>
+      </div>
+
+      <div class="d-flex align-center" style="gap:12px; margin-bottom:12px;">
+        <button class="btn-audio-prompt" onclick="GameAudio.speak('routine')" style="font-size:0.8125rem; padding:8px 14px; min-height:40px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          Hear instructions
+        </button>
+      </div>
+
+      <div class="soft-progress-container">
+        <div class="soft-progress-track">
+          <div class="soft-progress-fill" id="routine-progress-fill"></div>
+        </div>
+        <div class="soft-progress-label" id="routine-progress-label">0 placed</div>
+      </div>
+
+      <div class="section-label" style="margin-top:16px;">Choose a card from here…</div>
+      <div class="routine-bank" id="routine-bank" role="list" aria-label="Activity cards to place"></div>
+
+      <div class="section-label" style="margin-top:16px;">…and place it in the right step below</div>
+      <div class="routine-slots" id="routine-slots" role="list" aria-label="Step sequence slots"></div>
+
+      <div style="margin-top:20px;">
+        <button class="btn-game-primary" id="btn-routine-submit" style="display:none;">
+          Check My Answers
+        </button>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: ATTENTION SPOTTER
+         ───────────────────────────────────────────── -->
+    <div id="view-attention" class="game-view">
+      <div class="ingame-topbar">
+        <div>
+          <div class="ingame-title">Spot the Difference</div>
+          <div class="ingame-instructions">Look carefully at both pictures. Tap on the right-hand picture where something looks different.</div>
+        </div>
+        <button class="btn-back-home" id="back-home-attention">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Games Menu
+        </button>
+      </div>
+
+      <div class="d-flex align-center" style="gap:12px; margin-bottom:12px;">
+        <button class="btn-audio-prompt" onclick="GameAudio.speak('attention')" style="font-size:0.8125rem; padding:8px 14px; min-height:40px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          Hear instructions
+        </button>
+      </div>
+
+      <div class="soft-progress-container">
+        <div class="soft-progress-track">
+          <div class="soft-progress-fill" id="attention-progress-fill"></div>
+        </div>
+        <div class="soft-progress-label" id="attention-progress-label">0 found</div>
+      </div>
+
+      <div class="attention-scenes-wrap" id="attention-scenes-wrap"
+           aria-label="Two scenes to compare"></div>
+
+      <p style="font-size:0.8125rem; color:var(--color-text-muted); margin-top:12px; text-align:center;">
+        Tap on the <strong>right picture</strong> where you see a difference.
+      </p>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: PATTERN SORT
+         ───────────────────────────────────────────── -->
+    <div id="view-pattern" class="game-view">
+      <div class="ingame-topbar">
+        <div>
+          <div class="ingame-title">Sort &amp; Group</div>
+          <div class="ingame-instructions" id="sort-question">Sort each item into the correct group.</div>
+        </div>
+        <button class="btn-back-home" id="back-home-pattern">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Games Menu
+        </button>
+      </div>
+
+      <div class="d-flex align-center" style="gap:12px; margin-bottom:12px;">
+        <button class="btn-audio-prompt" onclick="GameAudio.speak('pattern')" style="font-size:0.8125rem; padding:8px 14px; min-height:40px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          Hear instructions
+        </button>
+      </div>
+
+      <div class="soft-progress-container">
+        <div class="soft-progress-track">
+          <div class="soft-progress-fill" id="pattern-progress-fill"></div>
+        </div>
+        <div class="soft-progress-label" id="pattern-progress-label">0 sorted</div>
+      </div>
+
+      <div class="sort-arena" style="margin-top:16px;">
+        <div class="sort-object-stage" id="sort-object-stage" aria-live="polite">
+          <!-- Current object injected by JS -->
+        </div>
+        <div class="sort-feedback" id="sort-feedback"></div>
+        <div class="sort-buckets" id="sort-buckets">
+          <!-- Category buttons injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: REMINISCENCE RECALL
+         ───────────────────────────────────────────── -->
+    <div id="view-reminiscence" class="game-view">
+      <div class="ingame-topbar">
+        <div>
+          <div class="ingame-title">Who Is This?</div>
+          <div class="ingame-instructions">Look at the photo and choose who it is. Take your time.</div>
+        </div>
+        <button class="btn-back-home" id="back-home-reminiscence">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Games Menu
+        </button>
+      </div>
+
+      <div class="d-flex align-center" style="gap:12px; margin-bottom:16px;">
+        <button class="btn-audio-prompt" onclick="GameAudio.speak('reminiscence')" style="font-size:0.8125rem; padding:8px 14px; min-height:40px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          Hear instructions
+        </button>
+      </div>
+
+      <div class="soft-progress-container">
+        <div class="soft-progress-track">
+          <div class="soft-progress-fill" id="reminiscence-progress-fill"></div>
+        </div>
+        <div class="soft-progress-label" id="reminiscence-progress-label">0 / 5</div>
+      </div>
+
+      <div style="text-align:center; margin-top:20px;">
+        <div class="reminiscence-photo-frame" id="reminiscence-avatar" aria-live="polite">
+          <!-- SVG avatar injected by JS -->
+        </div>
+        <div class="reminiscence-question" id="reminiscence-question">Who is this person?</div>
+        <div class="reminiscence-prompt" id="reminiscence-prompt">Look carefully…</div>
+        <div class="reminiscence-choices" id="reminiscence-choices" role="group" aria-label="Name choices">
+          <!-- Buttons injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: SORT IT OUT (CST CATEGORIZATION)
+         ───────────────────────────────────────────── -->
+    <div id="view-categorize" class="game-view">
+      <div class="ingame-topbar">
+        <div>
+          <div class="ingame-title">Sort It Out</div>
+          <div class="ingame-instructions" id="categorize-question">Sort each item into fruits or vegetables.</div>
+        </div>
+        <button class="btn-back-home" id="back-home-categorize" aria-label="Return to game menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Games Menu
+        </button>
+      </div>
+
+      <div class="d-flex align-center" style="gap:12px; margin-bottom:12px;">
+        <button class="btn-audio-prompt" onclick="GameAudio.speakRaw('Sort each item into fruits or vegetables. Take all your time.')" style="font-size:0.8125rem; padding:8px 14px; min-height:40px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          Hear instructions
+        </button>
+      </div>
+
+      <div class="soft-progress-container">
+        <div class="soft-progress-track">
+          <div class="soft-progress-fill" id="categorize-progress-fill"></div>
+        </div>
+        <div class="soft-progress-label" id="categorize-progress-label">0 sorted</div>
+      </div>
+
+      <div class="sort-arena" style="margin-top:16px;">
+        <div class="sort-object-stage" id="categorize-object-stage" aria-live="polite"></div>
+        <div class="sort-feedback" id="categorize-feedback"></div>
+        <div class="sort-buckets" id="categorize-buckets"></div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: END SCREEN (session complete)
+         ───────────────────────────────────────────── -->
+    <div id="view-end" class="game-view">
+      <div class="result-panel">
+        <div class="result-star-row" aria-hidden="true">
+          <svg class="result-star" viewBox="0 0 24 24" fill="var(--status-attention)">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <svg class="result-star" viewBox="0 0 24 24" fill="var(--status-attention)">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <svg class="result-star" viewBox="0 0 24 24" fill="var(--status-attention)">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <div class="result-heading" id="end-heading">Well played today!</div>
+        <p id="end-subtext" style="font-size:0.9375rem; color:var(--color-text-secondary); margin-bottom:4px; line-height:1.5;">
+          You did a wonderful job. Your progress has been saved for your doctor.
+        </p>
+
+        <ul class="result-summary-list" id="end-summary-list">
+          <!-- Injected by JS -->
+        </ul>
+
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:8px;">
+          <button class="btn-game-primary" id="btn-play-another">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/>
+            </svg>
+            Play Another Game
+          </button>
+          <button class="btn-back-home" id="btn-done-today" style="min-height:60px; font-size:1rem;">
+            I'm done for today
+          </button>
+        </div>
+      </div>
+    </div><!-- /view-end -->
+
+    <!-- ─────────────────────────────────────────────
+         VIEW: GOODBYE
+         ───────────────────────────────────────────── -->
+    <div id="view-goodbye" class="game-view">
+      <div style="text-align:center; padding:60px 24px; max-width:480px; margin:0 auto;">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="var(--status-stable)" stroke-width="1.5"
+             style="margin:0 auto 24px; display:block;">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <div class="welcome-greeting" style="font-size:1.75rem;">Great work today!</div>
+        <p style="font-size:1rem; color:var(--color-text-secondary); margin-top:12px; line-height:1.6;">
+          Your session has been saved. Your doctor will review your progress.<br><br>
+          Rest well. See you next time!
+        </p>
+        <div style="margin-top:32px; font-size:0.8125rem; color:var(--color-text-muted);">
+          You can close this page now.
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /game-main -->
+
+  <!-- ═══════════════════════════════════════════════
+       PATIENT REMINDER & ADHERENCE INTERSTITIAL
+       Large visual item, audio prompt, 72px touch target
+       ═══════════════════════════════════════════════ -->
+  <div id="patient-reminder-interstitial" class="patient-reminder-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="rem-modal-title">
+    <div class="patient-reminder-card">
+      <!-- Audio Narration Button -->
+      <button class="reminder-audio-btn" id="btn-reminder-audio" aria-label="Listen to reminder instructions aloud">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+        <span id="reminder-audio-btn-label">Listen Aloud (Audio Prompt)</span>
+      </button>
+
+      <!-- Realistic Visual Item Display -->
+      <div class="reminder-visual-stage" id="reminder-visual-stage">
+        <div class="patient-pill-item-large" id="reminder-pill-graphic">
+          <span class="pill-text-primary" id="reminder-pill-label">DNP</span>
+          <span class="pill-text-dosage" id="reminder-pill-dose">10mg</span>
+        </div>
+      </div>
+
+      <!-- Reminder Context & Instructions -->
+      <div class="reminder-meta-tag" id="reminder-meta-tag">Morning Medicine · 08:30 AM</div>
+      <h2 class="reminder-title-text" id="rem-modal-title">Donepezil 10mg</h2>
+      <p class="reminder-instructions-text" id="reminder-instructions-text">
+        Take 1 tablet after your morning meal with a glass of warm water.
+      </p>
+      <div class="reminder-doctor-prescription-tag" id="reminder-doctor-tag">
+        Prescribed by Dr. Priyam Borah (GMCH Memory Clinic) · Bedside Pillbox
+      </div>
+
+      <!-- 72px Touch Target Primary Acknowledgment -->
+      <button class="btn-reminder-done" id="btn-reminder-done" aria-label="Mark as taken">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span id="btn-reminder-done-text">Done, I Took It</span>
+      </button>
+
+      <!-- Secondary Gentle Snooze / Silent Dismissal -->
+      <button class="btn-reminder-snooze" id="btn-reminder-snooze" aria-label="Close or remind later">
+        Remind Me in 10 Minutes
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       EMERGENCY HELP / SOS MODAL (2-STEP ACCIDENTAL TRIGGER PROTECTED)
+       ═══════════════════════════════════════════════ -->
+  <div id="modal-emergency-sos" class="emergency-modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="sos-modal-title">
+    <div class="emergency-modal-card">
+      <div class="sos-icon-large" aria-hidden="true">🚨</div>
+      <h2 class="sos-title" id="sos-modal-title">Emergency Assistance</h2>
+      <p class="sos-desc" id="sos-modal-desc">
+        Do you need immediate help? Pressing the button below will dispatch an urgent tele-alert with your location to your caregiver <strong id="sos-caregiver-name">Pranab Hazarika</strong> and the GMCH Memory Unit.
+      </p>
+
+      <div class="sos-countdown-bar-wrap" id="sos-countdown-wrap" style="display: none;">
+        <div class="sos-countdown-bar" id="sos-countdown-bar"></div>
+      </div>
+
+      <div id="sos-status-message" class="mood-feedback-banner" style="display: none; margin-bottom: 16px; background: #FFF2F0; border-color: #E8C8C5; color: #9E382B;">
+        <span id="sos-status-text">Dispatching emergency alert...</span>
+      </div>
+
+      <div class="sos-actions-stack">
+        <button id="btn-confirm-sos" class="btn-confirm-sos" aria-label="Confirm emergency help dispatch">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span id="btn-confirm-sos-text">Yes, Send Help to Caregiver</span>
+        </button>
+
+        <button id="btn-cancel-sos" class="btn-cancel-sos" aria-label="Cancel emergency help">
+          <span>I Am Okay — Cancel</span>
+        </button>
+      </div>
+
+      <!-- Direct Phone Helpline Links -->
+      <div class="sos-phone-links-row">
+        <span>Direct Calls:</span>
+        <a href="tel:9435012890" id="sos-caregiver-phone-link">📞 Call Caregiver</a>
+        <a href="tel:112">🚨 National Emergency (112)</a>
+        <a href="tel:108">🚑 Medical Ambulance (108)</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PATIENT COMPANION NAVIGATION DRAWER (LEFT SLIDING BAR) & BACKDROP
+       Matches Clinician EHR sidebar design and layout
+       ═══════════════════════════════════════════════ -->
+  <div class="companion-sidebar-overlay" id="companion-sidebar-overlay" aria-hidden="true"></div>
+
+  <aside class="companion-sidebar sidebar" id="companion-sidebar" role="dialog" aria-modal="true" aria-label="Companion Navigation Drawer" aria-hidden="true">
+    <div class="clinician-sidebar-header">
+      <div class="clinician-sidebar-brand">
+        <div class="hospital-icon-box" aria-hidden="true" style="width: 36px; height: 36px; background: transparent; border: none;">
+          <!-- Official NeuroSync Emblem Image (Without Text) -->
+          <img src="/assets/logo.png" alt="NeuroSync Logo" class="brand-logo-img" width="36" height="36">
+        </div>
+        <div class="label">
+          <div class="clinician-sidebar-title">NeuroSync</div>
+          <div class="clinician-sidebar-sub">Patient Companion · GMCH Memory Unit</div>
+        </div>
+      </div>
+      <button type="button" id="btn-collapse-sidebar" class="btn-sidebar-collapse" aria-label="Close Navigation Menu" title="Close Menu (Esc)">
+        <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Companion Views Navigation -->
+    <nav class="clinician-sidebar-nav" aria-label="Companion Primary Navigation">
+      <div class="sidebar-section-title label">COMPANION CARE VIEWS</div>
+
+      <ul class="nav" id="patient-nav-list">
+        <li class="indicator" aria-hidden="true"></li>
+        <li>
+          <button type="button" id="nav-btn-dashboard" class="sidebar-nav-btn sidebar-nav-item nav-link active" aria-current="page">
+            <div class="nav-item-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="sidebar-nav-info nav-item-content label">
+              <span class="sidebar-nav-title nav-item-title">Today's Dashboard</span>
+              <span class="sidebar-nav-desc nav-item-desc">Daily orientation, clock &amp; tasks</span>
+            </div>
+            <span class="nav-item-badge label">Active</span>
+          </button>
+        </li>
+
+        <li>
+          <button type="button" id="nav-btn-reminders" class="sidebar-nav-btn sidebar-nav-item nav-link">
+            <div class="nav-item-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+            </div>
+            <div class="sidebar-nav-info nav-item-content label">
+              <span class="sidebar-nav-title nav-item-title">Daily Medicines</span>
+              <span class="sidebar-nav-desc nav-item-desc">Prescription times &amp; routine</span>
+            </div>
+            <span class="nav-item-badge label">Active</span>
+          </button>
+        </li>
+
+        <li>
+          <button type="button" id="nav-btn-activities" class="sidebar-nav-btn sidebar-nav-item nav-link">
+            <div class="nav-item-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <div class="sidebar-nav-info nav-item-content label">
+              <span class="sidebar-nav-title nav-item-title">Brain Activities</span>
+              <span class="sidebar-nav-desc nav-item-desc">Memory, attention &amp; puzzles</span>
+            </div>
+            <span class="nav-item-badge label">Active</span>
+          </button>
+        </li>
+
+        <li>
+          <button type="button" id="nav-btn-calendar" class="sidebar-nav-btn sidebar-nav-item nav-link" data-view="calendar">
+            <div class="nav-item-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+            </div>
+            <div class="sidebar-nav-info nav-item-content label">
+              <span class="sidebar-nav-title nav-item-title">Activity Calendar</span>
+              <span class="sidebar-nav-desc nav-item-desc">Daily history &amp; health records</span>
+            </div>
+            <span class="nav-item-badge label">Records</span>
+          </button>
+        </li>
+
+        <!-- Audio Guidance Mute Option in Drawer -->
+        <li>
+          <button type="button" id="sidebar-btn-mute" class="sidebar-nav-btn sidebar-nav-item nav-link" aria-label="Toggle Audio Sound">
+            <div class="nav-item-icon-box">
+              <span id="sidebar-mute-icon" style="font-size: 1.1rem;">🔊</span>
+            </div>
+            <div class="sidebar-nav-info nav-item-content label">
+              <span class="sidebar-nav-title nav-item-title" id="sidebar-mute-title">Audio Guidance</span>
+              <span class="sidebar-nav-desc nav-item-desc" id="sidebar-mute-desc">Sound is currently on</span>
+            </div>
+            <span class="nav-item-badge label" id="sidebar-mute-badge" style="background: rgba(16, 185, 129, 0.15); color: #059669;">On</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Emergency Help in Sidebar & Quick Profile Card & Portal Switcher Footer -->
+    <div class="clinician-sidebar-footer">
+      <button id="btn-patient-sos" class="sidebar-sos-btn" aria-haspopup="dialog" aria-label="Open emergency assistance help">
+        <span style="font-size: 1.3rem;">🚨</span>
+        <div style="text-align: left;">
+          <div style="font-weight: 700; font-size: 0.9rem;">Emergency Help (SOS)</div>
+          <div style="font-size: 0.72rem; opacity: 0.85;">Dispatches alert to your caregiver</div>
+        </div>
+      </button>
+
+      <div class="sidebar-patient-quick-card">
+        <div class="quick-card-label">Active Patient Profile</div>
+        <div class="quick-card-name" id="sidebar-patient-name">—</div>
+        <div class="quick-card-loc" id="sidebar-patient-district">—</div>
+        <button id="btn-sidebar-open-profile" class="btn-sidebar-edit-profile">✏️ Edit Profile</button>
+      </div>
+
+      <div class="sidebar-registry-badge">
+        <div class="badge-dot-live"></div>
+        <div>
+          <div class="badge-title">NER Registry Node 03 · Guwahati</div>
+          <div class="badge-sub">DISHA &amp; DPDP Act 2026 Compliant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Floating Edge Button to Open Sidebar when collapsed (Left side, matching doctor's) -->
+  <button type="button" id="btn-float-open-sidebar" class="btn-float-open-sidebar" aria-label="Open Navigation Menu" title="Open Navigation Menu">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+    <span>Menu</span>
+  </button>
+
+  <!-- ═══════════════════════════════════════════════
+       PATIENT PROFILE MODAL (VIEW & EDIT PROFILE)
+       ═══════════════════════════════════════════════ -->
+  <div class="profile-modal-backdrop" id="modal-patient-profile" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" style="display: none;">
+    <div class="profile-modal-card">
+      <div class="profile-modal-header">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div class="profile-modal-avatar" id="modal-profile-avatar">?</div>
+          <div>
+            <h2 id="profile-modal-title" class="profile-modal-title">Patient Profile</h2>
+            <p class="profile-modal-subtitle">Personal details &amp; calming grounding anchors</p>
+          </div>
+        </div>
+        <button type="button" id="btn-close-patient-profile" class="btn-profile-close" aria-label="Close Profile">✕</button>
+      </div>
+
+      <form id="form-patient-profile" class="profile-modal-form" onsubmit="return false;">
+        <div class="profile-form-grid">
+          <!-- Patient Name -->
+          <div class="profile-form-group col-span-2">
+            <label for="prof-input-name" class="profile-field-label">Patient Full Name *</label>
+            <input type="text" id="prof-input-name" class="profile-input" required placeholder="e.g. Bhaben Chandra Hazarika" autocomplete="name" />
+          </div>
+
+          <!-- Age -->
+          <div class="profile-form-group">
+            <label for="prof-input-age" class="profile-field-label">Age (Years)</label>
+            <input type="number" id="prof-input-age" class="profile-input" min="1" max="120" placeholder="e.g. 74" />
+          </div>
+
+          <!-- Gender -->
+          <div class="profile-form-group">
+            <label for="prof-select-gender" class="profile-field-label">Gender</label>
+            <select id="prof-select-gender" class="profile-input">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other / Prefer not to say</option>
+            </select>
+          </div>
+
+          <!-- Address / District -->
+          <div class="profile-form-group col-span-2">
+            <label for="prof-input-address" class="profile-field-label">Address / Village / District</label>
+            <input type="text" id="prof-input-address" class="profile-input" placeholder="e.g. Kamrup (Assam)" />
+          </div>
+
+          <!-- Favorite Number (Calming Memory Anchor) -->
+          <div class="profile-form-group">
+            <label for="prof-input-fav-number" class="profile-field-label">
+              Favorite Number
+              <span class="field-hint">(Memory Anchor)</span>
+            </label>
+            <input type="number" id="prof-input-fav-number" class="profile-input" placeholder="e.g. 7" />
+          </div>
+
+          <!-- Emergency Caregiver Phone -->
+          <div class="profile-form-group">
+            <label for="prof-input-phone" class="profile-field-label">Emergency / Caregiver Phone</label>
+            <input type="tel" id="prof-input-phone" class="profile-input" placeholder="+91 94350-12890" />
+          </div>
+        </div>
+
+        <div class="profile-modal-actions">
+          <button type="button" id="btn-cancel-patient-profile" class="btn-profile-cancel">Cancel</button>
+          <button type="submit" id="btn-save-patient-profile" class="btn-profile-save">
+            <span>💾 Save Profile</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Medical Disclaimer & Legal Support Notice Footer -->
+  <footer class="patient-disclaimer-footer" role="contentinfo">
+    <p>
+      <strong>Care Support Companion Notice:</strong> CDX-GERI-NER is a supportive cognitive engagement and tele-care monitoring tool developed for the GMCH Regional Memory Unit. It does not replace professional clinical diagnosis or emergency medical dispatch. All patient data is strictly guarded for authorized care continuity under informed clinical consent.
+    </p>
+  </footer>
+
+</div><!-- /game-shell -->
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS — ORDER MATTERS
+     ═══════════════════════════════════════════════ -->
+<script src="js/data.js"></script>
+<script src="js/ai-detection.js"></script>
+<script src="js/games-data.js"></script>
+<script src="js/game-orientation.js"></script>
+<script src="js/game-memory.js"></script>
+<script src="js/game-routine.js"></script>
+<script src="js/game-attention.js"></script>
+<script src="js/game-pattern.js"></script>
+<script src="js/game-categorize.js"></script>
+<script src="js/game-reminiscence.js"></script>
+
+<script>
+/* ============================================================
+   GameApp — Main orchestrator: routing, UI, encouragement
+   ============================================================ */
+const GameApp = {
+  patientId: null,
+  patient: null,
+  _activeReminder: null,
+  _activeView: "view-not-found",
+  _toastTimer: null,
+  _clockInterval: null,
+  _sosCountdownTimer: null,
+
+  init() {
+    const params = new URLSearchParams(window.location.search);
+    const isEmbed = params.get("embed") === "1";
+    if (isEmbed) {
+      document.body.classList.add("is-embedded");
+      const btnToClinician = document.getElementById("btn-to-clinician-dashboard");
+      if (btnToClinician) btnToClinician.style.display = "none";
+    }
+
+    // Default to first patient if none specified
+    const defaultPatientId = (typeof CLINICAL_DATA !== "undefined" && CLINICAL_DATA.patients && CLINICAL_DATA.patients.length > 0)
+      ? CLINICAL_DATA.patients[0].id
+      : "NER-2024-081";
+
+    this.patientId = params.get("patient") || params.get("id") || defaultPatientId;
+
+    if (typeof CLINICAL_DATA === "undefined") {
+      this._showView("view-not-found");
+      return;
+    }
+
+    this.patient = CLINICAL_DATA.patients.find(p => p.id === this.patientId);
+    if (!this.patient) {
+      this.patient = CLINICAL_DATA.patients[0];
+      this.patientId = this.patient.id;
+    }
+
+    // Restore any personalized profile edits (Name, Age, Gender, Address, Favorite Number, Caregiver Phone)
+    const savedCustomProfile = localStorage.getItem("patient_profile_" + this.patientId);
+    if (savedCustomProfile) {
+      try {
+        const parsed = JSON.parse(savedCustomProfile);
+        if (parsed.name) this.patient.name = parsed.name;
+        if (parsed.age) this.patient.age = Number(parsed.age);
+        if (parsed.gender) this.patient.gender = parsed.gender;
+        if (parsed.district) this.patient.district = parsed.district;
+        if (parsed.favoriteNumber !== undefined) this.patient.favoriteNumber = parsed.favoriteNumber;
+        if (parsed.caregiverPhone) {
+          if (!this.patient.caregiver) this.patient.caregiver = {};
+          this.patient.caregiver.contact = parsed.caregiverPhone;
+        }
+      } catch (err) {
+        console.warn("Could not load cached patient profile", err);
+      }
+    }
+
+    // Populate patient switcher & name pill
+    this._populatePatientSwitcher();
+
+    // Restore any cached sessions & reminder telemetry
+    SessionLogger.restoreFromLocalStorage(this.patientId);
+    if (typeof ReminderSync !== "undefined") {
+      ReminderSync.restoreReminderData(this.patientId);
+      // Automatically reset daily medication and care schedule if a new day has arrived
+      ReminderSync.checkDailyReset(this.patientId);
+    }
+
+    // Init audio for patient's language
+    GameAudio.init(this.patient.language || "English");
+
+    // Wire Mute / Audio controls
+    this._wireMuteButtons();
+
+    // Update header & live clock
+    this._updateHeader();
+    this._setupLiveClock();
+
+    // Wire right sidebar dashboard & profile modal
+    this._setupCompanionSidebar();
+    this._setupPatientProfileModal();
+
+    // Wire universal patient navigation
+    this._wirePatientNavigation();
+
+    // Wire Emergency SOS modal
+    this._setupEmergencyModal();
+
+    // Render patient dashboard & reminders
+    this._renderPatientDashboard();
+    this._renderRemindersView();
+
+    // Initialize difficulty labels on cards
+    this._setDifficultyLabels();
+
+    if (typeof GameOrientation !== "undefined") {
+      GameOrientation.render("orientation-board-container", this.patient);
+    }
+
+    // Wire home screen navigation & games
+    this._wireHomeCards();
+    this._wireBackButtons();
+    this._wireEndScreen();
+
+    // Wire reminder interstitial and home banner
+    this._wireReminderInterstitial();
+    this._updateHomeReminderBanner();
+
+    // Show Patient Dashboard by default
+    const viewParam = params.get("view");
+    if (viewParam === "games" || viewParam === "activities") {
+      this._showView("view-home");
+    } else if (viewParam === "reminders") {
+      this._showView("view-reminders");
+    } else if (viewParam === "calendar") {
+      this._renderActivityCalendar();
+      this._showView("view-calendar");
+    } else {
+      this._showView("view-dashboard");
+    }
+
+    // Check if auto-triggered via reminder schedule
+    const triggerParam = params.get("trigger");
+    const typeParam = params.get("type");
+    if (triggerParam === "reminder" || params.get("reminder")) {
+      setTimeout(() => this.showReminderInterstitial(typeParam), 450);
+    }
+
+    // Listen for external sync updates
+    window.addEventListener("cdx:reminders-updated", () => {
+      this._renderPatientDashboard();
+      this._renderRemindersView();
+      if (this._activeView === "view-calendar") {
+        this._renderActivityCalendar();
+      }
+    });
+  },
+
+  _setupLiveClock() {
+    const updateTime = () => {
+      const clockEl = document.getElementById("patient-live-clock");
+      const dateEl = document.getElementById("patient-full-date");
+      const now = new Date();
+      
+      if (clockEl) {
+        clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+      if (dateEl) {
+        dateEl.textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      }
+    };
+
+    updateTime();
+    if (this._clockInterval) clearInterval(this._clockInterval);
+    this._clockInterval = setInterval(updateTime, 1000);
+  },
+
+  _wirePatientNavigation() {
+    const patientNav = document.getElementById("patient-nav-list");
+    const navDashboard = document.getElementById("nav-btn-dashboard");
+    const navReminders = document.getElementById("nav-btn-reminders");
+    const navActivities = document.getElementById("nav-btn-activities");
+    const navCalendar = document.getElementById("nav-btn-calendar");
+
+    const updateNavActive = (activeBtn) => {
+      const navButtons = patientNav ? [...patientNav.querySelectorAll("button")] : [navDashboard, navReminders, navActivities, navCalendar].filter(Boolean);
+      navButtons.forEach(btn => btn && btn.classList.remove("active"));
+      if (activeBtn) {
+        activeBtn.classList.add("active");
+        if (patientNav) {
+          const idx = navButtons.indexOf(activeBtn);
+          if (idx !== -1) {
+            patientNav.style.setProperty("--active-row", idx);
+          }
+          const li = activeBtn.closest("li");
+          if (li) {
+            patientNav.style.setProperty("--indicator-top", `${li.offsetTop}px`);
+            patientNav.style.setProperty("--indicator-height", `${li.offsetHeight}px`);
+            patientNav.style.setProperty("--row", `${li.offsetHeight}px`);
+          }
+        }
+      }
+    };
+
+    this._updateNavActive = updateNavActive;
+
+    if (navDashboard) {
+      navDashboard.addEventListener("click", () => {
+        updateNavActive(navDashboard);
+        this._showView("view-dashboard");
+      });
+    }
+
+    if (navReminders) {
+      navReminders.addEventListener("click", () => {
+        updateNavActive(navReminders);
+        this._renderRemindersView();
+        this._showView("view-reminders");
+      });
+    }
+
+    if (navActivities) {
+      navActivities.addEventListener("click", () => {
+        updateNavActive(navActivities);
+        this._showView("view-home");
+      });
+    }
+
+    if (navCalendar) {
+      navCalendar.addEventListener("click", () => {
+        updateNavActive(navCalendar);
+        this._renderActivityCalendar();
+        this._showView("view-calendar");
+      });
+    }
+
+    // Initialize indicator on currently active button
+    if (patientNav) {
+      const currentActive = patientNav.querySelector("button.active") || navDashboard;
+      if (currentActive) {
+        requestAnimationFrame(() => updateNavActive(currentActive));
+      }
+      window.addEventListener("resize", () => {
+        const cur = patientNav.querySelector("button.active");
+        if (cur) updateNavActive(cur);
+      });
+    }
+
+    // Back to dashboard buttons
+    const backFromRem = document.getElementById("btn-back-to-dashboard-from-rem");
+    if (backFromRem) {
+      backFromRem.addEventListener("click", () => {
+        updateNavActive(navDashboard);
+        this._showView("view-dashboard");
+      });
+    }
+
+    const backFromGames = document.getElementById("btn-back-to-dashboard-from-games");
+    if (backFromGames) {
+      backFromGames.addEventListener("click", () => {
+        updateNavActive(navDashboard);
+        this._showView("view-dashboard");
+      });
+    }
+
+    const backFromCal = document.getElementById("btn-back-to-dashboard-from-cal");
+    if (backFromCal) {
+      backFromCal.addEventListener("click", () => {
+        updateNavActive(navDashboard);
+        this._showView("view-dashboard");
+      });
+    }
+
+    const promoGoActivities = document.getElementById("btn-promo-go-activities");
+    if (promoGoActivities) {
+      promoGoActivities.addEventListener("click", () => {
+        updateNavActive(navActivities);
+        this._showView("view-home");
+      });
+    }
+
+    const viewAllMeds = document.getElementById("btn-dashboard-view-all-meds");
+    if (viewAllMeds) {
+      viewAllMeds.addEventListener("click", () => {
+        updateNavActive(navReminders);
+        this._renderRemindersView();
+        this._showView("view-reminders");
+      });
+    }
+
+    const viewCalendarBtn = document.getElementById("btn-dashboard-view-calendar");
+    if (viewCalendarBtn) {
+      viewCalendarBtn.addEventListener("click", () => {
+        if (navCalendar) updateNavActive(navCalendar);
+        this._renderActivityCalendar();
+        this._showView("view-calendar");
+      });
+    }
+  },
+
+  _renderPatientDashboard() {
+    if (!this.patient) return;
+
+    // 1. Text to Speech Guidance for today
+    const audioGuideBtn = document.getElementById("btn-read-today-schedule");
+    if (audioGuideBtn) {
+      audioGuideBtn.onclick = () => {
+        const p = this.patient;
+        const now = new Date();
+        const dateStr = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+        const allReminders = typeof ReminderSync !== "undefined" ? ReminderSync.getAllReminders(p.id) : [];
+        const upcomingCount = allReminders.filter(r => r.status === "upcoming").length;
+        
+        const spoken = `Good day, ${p.name.split(' ')[0]}. Today is ${dateStr}. The weather is pleasant and mild. You have ${upcomingCount} scheduled care reminders today. Remember to take your time and rest well.`;
+        GameAudio.speakRaw(spoken);
+      };
+    }
+
+    // 2. Mood Check-In Widget
+    const moodButtons = document.querySelectorAll(".btn-mood-choice");
+    const moodFeedback = document.getElementById("mood-feedback-banner");
+    const moodFeedbackText = document.getElementById("mood-feedback-text");
+    const audioMoodBtn = document.getElementById("btn-audio-mood");
+
+    if (audioMoodBtn) {
+      audioMoodBtn.onclick = () => {
+        GameAudio.speakRaw("How are you feeling right now? Please choose the face that feels most comfortable. Take all your time.");
+      };
+    }
+
+    moodButtons.forEach(btn => {
+      btn.onclick = () => {
+        moodButtons.forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+
+        const moodId = btn.getAttribute("data-mood");
+        const moodLabel = btn.getAttribute("data-label");
+        const emoji = btn.querySelector(".mood-emoji")?.textContent || "😊";
+
+        if (typeof ReminderSync !== "undefined") {
+          ReminderSync.logMood(this.patientId, { id: moodId, label: moodLabel, emoji });
+          ReminderSync.logPatientActivity(this.patientId, {
+            type: "Mood Check-In",
+            category: "Well-Being",
+            title: `Feeling ${moodLabel}`,
+            details: `Mood check-in recorded as ${moodLabel}`,
+            icon: emoji
+          });
+        }
+
+        if (moodFeedback && moodFeedbackText) {
+          let msg = "Thank you for sharing. We're right here with you!";
+          let audioKey = "moodResponseCalm";
+
+          if (moodId === "happy") {
+            msg = "So wonderful to see you feeling bright and cheerful today!";
+            audioKey = "moodResponseHappy";
+          } else if (moodId === "calm") {
+            msg = "A peaceful mind is wonderful for your well-being. Take slow steps today.";
+            audioKey = "moodResponseCalm";
+          } else if (moodId === "tired") {
+            msg = "It is completely fine to feel tired. Please rest comfortably.";
+            audioKey = "moodResponseTired";
+          } else if (moodId === "anxious") {
+            msg = "Do not worry at all. Your family and health worker are notified and here to help.";
+            audioKey = "moodResponseHelp";
+          }
+
+          moodFeedbackText.textContent = msg;
+          moodFeedback.style.display = "flex";
+          GameAudio.speak(audioKey);
+        }
+      };
+    });
+
+    // 3. Daily Gentle Question
+    if (typeof ReminderSync !== "undefined") {
+      const q = ReminderSync.getDailyQuestion(this.patientId);
+      const promptEl = document.getElementById("daily-question-prompt");
+      const optionsEl = document.getElementById("daily-question-options");
+      const qFeedback = document.getElementById("daily-question-feedback");
+      const qFeedbackText = document.getElementById("daily-question-feedback-text");
+      const audioQBtn = document.getElementById("btn-audio-question");
+
+      if (promptEl) promptEl.textContent = q.prompt;
+
+      if (audioQBtn) {
+        audioQBtn.onclick = () => {
+          GameAudio.speakRaw(q.prompt);
+        };
+      }
+
+      if (optionsEl) {
+        optionsEl.innerHTML = q.options.map(opt => `
+          <button class="btn-question-option" data-opt="${opt.id}" data-text="${opt.text}" aria-label="${opt.text}">
+            <span style="font-size: 1.35rem;">${opt.emoji}</span>
+            <span>${opt.text}</span>
+          </button>
+        `).join("");
+
+        optionsEl.querySelectorAll(".btn-question-option").forEach(btn => {
+          btn.onclick = () => {
+            optionsEl.querySelectorAll(".btn-question-option").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+
+            const optText = btn.getAttribute("data-text");
+            ReminderSync.logDailyQuestion(this.patientId, q.id, optText);
+            ReminderSync.logPatientActivity(this.patientId, {
+              type: "Gentle Orientation",
+              category: "Orientation",
+              title: `Answered: ${optText}`,
+              details: `Orientation question prompt: "${q.prompt}"`,
+              icon: "💬"
+            });
+
+            if (qFeedback && qFeedbackText) {
+              qFeedbackText.textContent = q.encouragement;
+              qFeedback.style.display = "flex";
+              GameAudio.speakRaw(q.encouragement);
+            }
+          };
+        });
+      }
+    }
+
+    // 4. Upcoming Medications List
+    const medsStack = document.getElementById("dashboard-meds-stack");
+    if (medsStack && typeof ReminderSync !== "undefined") {
+      const allReminders = ReminderSync.getAllReminders(this.patientId);
+      const displayReminders = allReminders.slice(0, 3); // Top 3 on dashboard
+
+      if (displayReminders.length === 0) {
+        medsStack.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--color-text-secondary);">No active medications scheduled.</div>`;
+      } else {
+        medsStack.innerHTML = displayReminders.map(r => {
+          const isDone = r.status === "completed" || r.status === "acknowledged";
+          const icon = (r.type || "").toLowerCase() === "medicine" ? "💊" : (r.type || "").toLowerCase() === "hydration" ? "🥛" : "🚶‍♂️";
+          return `
+            <div class="patient-med-card ${isDone ? 'completed' : ''}" data-id="${r.id}">
+              <div class="med-card-left">
+                <div class="med-pill-icon-box" aria-hidden="true">${icon}</div>
+                <div class="med-info-block">
+                  <span class="med-time-tag">${r.time || "Daily Schedule"}</span>
+                  <span class="med-name-text">${r.title}</span>
+                  <span class="med-instructions-text">${r.instructions || "Take with water"}</span>
+                </div>
+              </div>
+              <div class="med-card-actions">
+                ${isDone 
+                  ? `<span class="btn-med-done is-completed">✓ Taken</span>`
+                  : `<button class="btn-med-done" onclick="GameApp.completeReminderDirect('${r.id}')" aria-label="Mark ${r.title} as taken">
+                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                       <span>Done, Took It</span>
+                     </button>
+                     <button class="btn-med-snooze" onclick="GameApp.snoozeReminderDirect('${r.id}')" aria-label="Remind ${r.title} in 10 minutes">
+                       <span>Remind 10m</span>
+                     </button>`
+                }
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    // 5. Important Contacts
+    const contactsGrid = document.getElementById("patient-contacts-grid");
+    if (contactsGrid) {
+      const p = this.patient;
+      const contacts = [
+        {
+          name: p.caregiver?.name || "Family Caregiver",
+          relation: p.caregiver?.relation || "Primary Caregiver",
+          phone: p.caregiver?.contact || "+91 94350-12890",
+          initials: "FC"
+        },
+        {
+          name: p.assignedDoctor || "Dr. Priyam Borah",
+          relation: "Senior Neurologist (GMCH)",
+          phone: "+91 94350-99881",
+          initials: "PB"
+        },
+        {
+          name: p.assignedHealthWorker || "Minati Kalita",
+          relation: "Community ASHA Nurse",
+          phone: "+91 94350-55442",
+          initials: "MK"
+        }
+      ];
+
+      contactsGrid.innerHTML = contacts.map(c => `
+        <div class="contact-card">
+          <div class="contact-avatar">${c.initials}</div>
+          <div class="contact-name">${c.name}</div>
+          <div class="contact-relation">${c.relation}</div>
+          <a href="tel:${c.phone.replace(/[^0-9+]/g, '')}" class="btn-contact-call" aria-label="Call ${c.name}">
+            <span>📞 Call</span>
+          </a>
+        </div>
+      `).join("");
+    }
+
+    // 6. Safe-Zone Card
+    if (typeof ReminderSync !== "undefined") {
+      const sz = ReminderSync.getSafeZoneStatus(this.patientId);
+      const szTitle = document.getElementById("dashboard-safezone-title");
+      const szMeta = document.getElementById("dashboard-safezone-meta");
+      if (szTitle) szTitle.textContent = `${sz.badge} · ${sz.zoneName}`;
+      if (szMeta) szMeta.textContent = `${sz.telemetryStatus} · Radius ${sz.geoFenceRadiusMeters}m`;
+    }
+  },
+
+  _renderRemindersView() {
+    const fullStack = document.getElementById("full-reminders-stack");
+    if (!fullStack || typeof ReminderSync === "undefined") return;
+
+    const allReminders = ReminderSync.getAllReminders(this.patientId);
+    if (allReminders.length === 0) {
+      fullStack.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--color-text-secondary);">No reminders scheduled yet.</div>`;
+      return;
+    }
+
+    fullStack.innerHTML = allReminders.map(r => {
+      const isDone = r.status === "completed" || r.status === "acknowledged";
+      const isMissed = r.status === "missed";
+      const isPostponed = r.status === "postponed";
+      const icon = (r.type || "").toLowerCase() === "medicine" ? "💊" : (r.type || "").toLowerCase() === "hydration" ? "🥛" : (r.type || "").toLowerCase() === "activity" ? "🚶‍♂️" : "🏥";
+
+      let statusBadge = `<span style="font-size: 0.75rem; background: #EBF2F1; color: var(--color-brand-primary); padding: 3px 10px; border-radius: 12px; font-weight: 600;">Upcoming</span>`;
+      if (isDone) {
+        statusBadge = `<span style="font-size: 0.75rem; background: #EDF4F0; color: #2D7A58; padding: 3px 10px; border-radius: 12px; font-weight: 600;">✓ Completed</span>`;
+      } else if (isPostponed) {
+        statusBadge = `<span style="font-size: 0.75rem; background: #FAF3E8; color: #8C5E1A; padding: 3px 10px; border-radius: 12px; font-weight: 600;">⏰ Postponed 10m</span>`;
+      } else if (isMissed) {
+        statusBadge = `<span style="font-size: 0.75rem; background: #F7ECEB; color: #9E382B; padding: 3px 10px; border-radius: 12px; font-weight: 600;">⚠️ Missed</span>`;
+      }
+
+      return `
+        <div class="patient-med-card ${isDone ? 'completed' : ''}" style="margin-bottom: 8px;">
+          <div class="med-card-left">
+            <div class="med-pill-icon-box" aria-hidden="true">${icon}</div>
+            <div class="med-info-block">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="med-time-tag">${r.time || "Scheduled"}</span>
+                ${statusBadge}
+              </div>
+              <span class="med-name-text">${r.title}</span>
+              <span class="med-instructions-text">${r.instructions || "Follow care instructions"}</span>
+            </div>
+          </div>
+          <div class="med-card-actions">
+            <button class="btn-audio-prompt" onclick="GameAudio.speakRaw('${r.title.replace(/'/g, "")}. ${r.instructions ? r.instructions.replace(/'/g, "") : ""}')" aria-label="Listen aloud to ${r.title}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            </button>
+            ${isDone 
+              ? `<span class="btn-med-done is-completed">✓ Completed</span>`
+              : `<button class="btn-med-done" onclick="GameApp.completeReminderDirect('${r.id}')" aria-label="Mark ${r.title} as taken">
+                   <span>✓ Done, Took It</span>
+                 </button>
+                 <button class="btn-med-snooze" onclick="GameApp.snoozeReminderDirect('${r.id}')" aria-label="Postpone ${r.title}">
+                   <span>Remind Later</span>
+                 </button>`
+            }
+          </div>
+        </div>
+      `;
+    }).join("");
+  },
+
+  completeReminderDirect(reminderId) {
+    if (typeof ReminderSync !== "undefined") {
+      ReminderSync.setReminderStatus(this.patientId, reminderId, "completed");
+      const allRems = ReminderSync.getAllReminders(this.patientId);
+      const rem = allRems.find(r => r.id === reminderId);
+      ReminderSync.logPatientActivity(this.patientId, {
+        type: "Medication",
+        category: "Care",
+        title: rem ? rem.title : "Medication Dose",
+        details: rem ? `${rem.instructions || 'Dose taken with water'} · ${rem.dosage || ''}` : "Completed on schedule",
+        icon: "💊"
+      });
+    }
+    GameAudio.speak("reminderAcknowledged");
+    this.showEncouragement("✓ Marked as taken! Thank you for staying healthy today.");
+    this._renderPatientDashboard();
+    this._renderRemindersView();
+    if (this._activeView === "view-calendar") {
+      this._renderActivityCalendar();
+    }
+  },
+
+  snoozeReminderDirect(reminderId) {
+    if (typeof ReminderSync !== "undefined") {
+      ReminderSync.setReminderStatus(this.patientId, reminderId, "postponed");
+    }
+    GameAudio.speak("reminderPostponed");
+    this.showEncouragement("Reminder postponed for 10 minutes. Rest well.");
+    this._renderPatientDashboard();
+    this._renderRemindersView();
+    if (this._activeView === "view-calendar") {
+      this._renderActivityCalendar();
+    }
+  },
+
+  _setupEmergencyModal() {
+    const sosBtn = document.getElementById("btn-patient-sos");
+    const modal = document.getElementById("modal-emergency-sos");
+    const confirmBtn = document.getElementById("btn-confirm-sos");
+    const cancelBtn = document.getElementById("btn-cancel-sos");
+    const countdownWrap = document.getElementById("sos-countdown-wrap");
+    const countdownBar = document.getElementById("sos-countdown-bar");
+    const statusMsg = document.getElementById("sos-status-message");
+    const statusText = document.getElementById("sos-status-text");
+
+    const caregiverNameEl = document.getElementById("sos-caregiver-name");
+    const caregiverPhoneLink = document.getElementById("sos-caregiver-phone-link");
+
+    if (this.patient && caregiverNameEl) {
+      caregiverNameEl.textContent = this.patient.caregiver?.name || "Family Caregiver";
+    }
+    if (this.patient && caregiverPhoneLink && this.patient.caregiver?.contact) {
+      caregiverPhoneLink.href = `tel:${this.patient.caregiver.contact.replace(/[^0-9+]/g, '')}`;
+      caregiverPhoneLink.textContent = `📞 Call Caregiver (${this.patient.caregiver.contact})`;
+    }
+
+    const openSOSModal = () => {
+      if (!modal) return;
+      modal.style.display = "flex";
+      if (statusMsg) statusMsg.style.display = "none";
+      if (countdownWrap) countdownWrap.style.display = "block";
+      if (countdownBar) {
+        countdownBar.style.width = "100%";
+        countdownBar.style.transition = "width 5s linear";
+        setTimeout(() => { countdownBar.style.width = "0%"; }, 50);
+      }
+
+      // Voice prompt
+      GameAudio.speakRaw("Emergency help requested. You can cancel at any time if you pressed by mistake.");
+
+      // 5-second automatic countdown
+      clearTimeout(this._sosCountdownTimer);
+      this._sosCountdownTimer = setTimeout(() => {
+        triggerDispatched();
+      }, 5100);
+    };
+
+    const triggerDispatched = () => {
+      clearTimeout(this._sosCountdownTimer);
+      if (countdownWrap) countdownWrap.style.display = "none";
+      if (statusMsg && statusText) {
+        statusText.textContent = "✓ Emergency alert dispatched via SMS to your caregiver and GMCH Unit!";
+        statusMsg.style.display = "flex";
+      }
+
+      if (typeof ReminderSync !== "undefined") {
+        ReminderSync.triggerSOS(this.patientId, {
+          location: `Home Residence (${this.patient.district || 'Assam'})`
+        });
+      }
+
+      GameAudio.speak("sosTriggered");
+
+      setTimeout(() => {
+        if (modal) modal.style.display = "none";
+        this.showEncouragement("Emergency alert sent. Help is on the way. Stay calm.");
+      }, 3500);
+    };
+
+    if (sosBtn) {
+      sosBtn.addEventListener("click", openSOSModal);
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener("click", () => {
+        triggerDispatched();
+      });
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", () => {
+        clearTimeout(this._sosCountdownTimer);
+        if (modal) modal.style.display = "none";
+        GameAudio.speakRaw("Emergency alert canceled. You are safe.");
+        this.showEncouragement("Emergency alert canceled.");
+      });
+    }
+  },
+
+  _populatePatientSwitcher() {
+    const select = document.getElementById("game-patient-select");
+    const pillText = document.getElementById("patient-display-name-text");
+
+    if (this.patient && pillText) {
+      const dist = (this.patient.district || "").split('(')[0].trim();
+      pillText.textContent = dist ? `${this.patient.name} (${dist})` : this.patient.name;
+    }
+
+    if (!select || typeof CLINICAL_DATA === "undefined") return;
+
+    select.innerHTML = CLINICAL_DATA.patients.map(p => {
+      const isSelected = p.id === this.patientId ? "selected" : "";
+      return `<option value="${p.id}" ${isSelected}>${p.name} (${(p.district || '').split('(')[0].trim()})</option>`;
+    }).join("");
+
+    select.onchange = (e) => {
+      const nextId = e.target.value;
+      const isEmbed = new URLSearchParams(window.location.search).get("embed") === "1";
+      window.location.href = `games.html?patient=${nextId}${isEmbed ? '&embed=1' : ''}`;
+    };
+  },
+
+  _updateHeader() {
+    const p = this.patient;
+    const nameEl = document.getElementById("header-patient-name");
+    const idEl   = document.getElementById("header-patient-id");
+    const avEl   = document.getElementById("header-patient-avatar");
+    const greet  = document.getElementById("welcome-greeting");
+    const pillText = document.getElementById("patient-display-name-text");
+    const sbName = document.getElementById("sidebar-patient-name");
+    const sbDist = document.getElementById("sidebar-patient-district");
+    const modalAv = document.getElementById("modal-profile-avatar");
+
+    const firstName = p.name ? p.name.split(" ")[0] : "Friend";
+    const initials = p.name ? p.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() : "P";
+    const distClean = (p.district || "").split('(')[0].trim();
+
+    if (nameEl) nameEl.textContent = p.name || "Patient";
+    if (idEl)   idEl.textContent   = `${p.id || ''} · ${p.language || 'Assamese'}`;
+    if (avEl)   avEl.textContent   = initials;
+    if (modalAv) modalAv.textContent = initials;
+    if (greet)  greet.textContent  = `Hello, ${firstName}!`;
+    if (pillText) pillText.textContent = distClean ? `${p.name} (${distClean})` : (p.name || "Patient");
+    if (sbName) sbName.textContent = p.name || "Patient";
+    if (sbDist) sbDist.textContent = p.district ? `📍 ${p.district}` : "Regional Unit";
+
+    // Update SOS caregiver contact if present
+    const caregiverNameEl = document.getElementById("sos-caregiver-name");
+    const caregiverPhoneLink = document.getElementById("sos-caregiver-phone-link");
+    if (caregiverNameEl && p.caregiver?.name) {
+      caregiverNameEl.textContent = p.caregiver.name;
+    }
+    if (caregiverPhoneLink && p.caregiver?.contact) {
+      caregiverPhoneLink.href = `tel:${p.caregiver.contact.replace(/[^0-9+]/g, '')}`;
+      caregiverPhoneLink.textContent = `📞 Call Caregiver (${p.caregiver.contact})`;
+    }
+
+    document.title = `NeuroSync | ${p.name} — Patient Companion`;
+  },
+
+  _setupCompanionSidebar() {
+    const sidebar = document.getElementById("companion-sidebar");
+    const overlay = document.getElementById("companion-sidebar-overlay");
+    const toggleBtn = document.getElementById("btn-toggle-companion-sidebar");
+    const floatBtn = document.getElementById("btn-float-open-sidebar");
+    const collapseBtn = document.getElementById("btn-collapse-sidebar");
+
+    const openSidebar = () => {
+      if (!sidebar) return;
+      sidebar.classList.add("open");
+      sidebar.setAttribute("aria-hidden", "false");
+      if (overlay) {
+        overlay.classList.add("open");
+        overlay.setAttribute("aria-hidden", "false");
+      }
+      if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "true");
+      if (floatBtn) {
+        floatBtn.classList.add("is-hidden");
+        floatBtn.setAttribute("aria-hidden", "true");
+      }
+
+      // Re-align indicator with accurate layout coordinates when drawer opens
+      requestAnimationFrame(() => {
+        const nav = document.getElementById("patient-nav-list");
+        if (nav) {
+          const active = nav.querySelector("button.active") || nav.querySelector("button");
+          if (active) {
+            const li = active.closest("li");
+            if (li) {
+              nav.style.setProperty("--indicator-top", `${li.offsetTop}px`);
+              nav.style.setProperty("--indicator-height", `${li.offsetHeight}px`);
+              nav.style.setProperty("--row", `${li.offsetHeight}px`);
+            }
+          }
+        }
+      });
+    };
+
+    const closeSidebar = () => {
+      if (!sidebar) return;
+      sidebar.classList.remove("open");
+      sidebar.setAttribute("aria-hidden", "true");
+      if (overlay) {
+        overlay.classList.remove("open");
+        overlay.setAttribute("aria-hidden", "true");
+      }
+      if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
+      if (floatBtn) {
+        floatBtn.classList.remove("is-hidden");
+        floatBtn.setAttribute("aria-hidden", "false");
+      }
+    };
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", () => {
+        if (sidebar && sidebar.classList.contains("open")) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      });
+    }
+
+    if (floatBtn) floatBtn.addEventListener("click", openSidebar);
+    if (collapseBtn) collapseBtn.addEventListener("click", closeSidebar);
+    if (overlay) overlay.addEventListener("click", closeSidebar);
+
+    // Close on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && sidebar && sidebar.classList.contains("open")) {
+        closeSidebar();
+      }
+    });
+
+    // Automatically collapse after selecting a destination on smaller screens
+    ["nav-btn-dashboard", "nav-btn-reminders", "nav-btn-activities", "nav-btn-calendar"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener("click", () => {
+          if (window.innerWidth < 1024) {
+            setTimeout(closeSidebar, 240);
+          }
+        });
+      }
+    });
+  },
+
+  _setupPatientProfileModal() {
+    const modal = document.getElementById("modal-patient-profile");
+    const openBtn = document.getElementById("btn-open-patient-profile");
+    const sidebarOpenBtn = document.getElementById("btn-sidebar-open-profile");
+    const closeBtn = document.getElementById("btn-close-patient-profile");
+    const cancelBtn = document.getElementById("btn-cancel-patient-profile");
+    const form = document.getElementById("form-patient-profile");
+
+    const inputName = document.getElementById("prof-input-name");
+    const inputAge = document.getElementById("prof-input-age");
+    const selectGender = document.getElementById("prof-select-gender");
+    const inputAddress = document.getElementById("prof-input-address");
+    const inputFavNumber = document.getElementById("prof-input-fav-number");
+    const inputPhone = document.getElementById("prof-input-phone");
+
+    const populateForm = () => {
+      const p = this.patient;
+      if (!p) return;
+      if (inputName) inputName.value = p.name || "";
+      if (inputAge) inputAge.value = p.age || "";
+      if (selectGender) selectGender.value = p.gender || "Male";
+      if (inputAddress) inputAddress.value = p.district || "";
+      if (inputFavNumber) inputFavNumber.value = (p.favoriteNumber !== undefined && p.favoriteNumber !== null) ? p.favoriteNumber : "";
+      if (inputPhone) inputPhone.value = p.caregiver?.contact || "";
+    };
+
+    const openModal = () => {
+      populateForm();
+      if (modal) {
+        modal.style.display = "flex";
+        setTimeout(() => inputName && inputName.focus(), 50);
+      }
+    };
+
+    const closeModal = () => {
+      if (modal) modal.style.display = "none";
+    };
+
+    if (openBtn) openBtn.addEventListener("click", openModal);
+    if (sidebarOpenBtn) sidebarOpenBtn.addEventListener("click", openModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+
+    if (modal) {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal && modal.style.display === "flex") {
+        closeModal();
+      }
+    });
+
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const newName = (inputName?.value || "").trim();
+        if (!newName) {
+          alert("Please enter a patient name.");
+          return;
+        }
+
+        const newAge = inputAge?.value ? parseInt(inputAge.value, 10) : this.patient.age;
+        const newGender = selectGender?.value || this.patient.gender;
+        const newDistrict = (inputAddress?.value || "").trim() || this.patient.district;
+        const newFavNum = inputFavNumber?.value !== "" ? parseInt(inputFavNumber.value, 10) : (this.patient.favoriteNumber || null);
+        const newPhone = (inputPhone?.value || "").trim() || (this.patient.caregiver?.contact || "");
+
+        // Update in-memory patient
+        this.patient.name = newName;
+        this.patient.age = newAge;
+        this.patient.gender = newGender;
+        this.patient.district = newDistrict;
+        this.patient.favoriteNumber = newFavNum;
+        if (!this.patient.caregiver) this.patient.caregiver = {};
+        this.patient.caregiver.contact = newPhone;
+
+        // Persist customized profile to localStorage
+        const customData = {
+          name: newName,
+          age: newAge,
+          gender: newGender,
+          district: newDistrict,
+          favoriteNumber: newFavNum,
+          caregiverPhone: newPhone
+        };
+        try {
+          localStorage.setItem("patient_profile_" + this.patientId, JSON.stringify(customData));
+        } catch (err) {
+          console.warn("Storage error saving profile", err);
+        }
+
+        // Re-render header & display pill
+        this._updateHeader();
+
+        // Close modal smoothly
+        closeModal();
+
+        // Feedback
+        this.showEncouragement("Profile details updated successfully!");
+        GameAudio.speakRaw(`Profile saved for ${newName.split(' ')[0]}.`);
+      });
+    }
+  },
+
+  _setDifficultyLabels() {
+    const MODULE_MAP = {
+      "diff-memory":       "memory",
+      "diff-routine":      "routineRecall",
+      "diff-attention":    "attention",
+      "diff-pattern":      "patternRecognition",
+      "diff-categorize":   "patternRecognition",
+      "diff-reminiscence": "memory"
+    };
+    Object.entries(MODULE_MAP).forEach(([elId, moduleKey]) => {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const tier = DifficultyEngine.getTier(this.patient, moduleKey);
+      el.textContent = DifficultyEngine.getTierLabel(tier);
+    });
+  },
+
+  _wireHomeCards() {
+    const cards = {
+      "card-memory":       () => this._startGame("memory"),
+      "card-routine":      () => this._startGame("routine"),
+      "card-attention":    () => this._startGame("attention"),
+      "card-pattern":      () => this._startGame("pattern"),
+      "card-categorize":   () => this._startGame("categorize"),
+      "card-reminiscence": () => this._startGame("reminiscence")
+    };
+    Object.entries(cards).forEach(([id, fn]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("click", fn);
+      el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") fn(); });
+    });
+  },
+
+  _wireBackButtons() {
+    ["memory","routine","attention","pattern","categorize","reminiscence"].forEach(name => {
+      const btn = document.getElementById(`back-home-${name}`);
+      if (btn) btn.addEventListener("click", () => {
+        window.speechSynthesis && window.speechSynthesis.cancel();
+        GameAttention && clearInterval(GameAttention.idleTimer);
+
+        if (this._activeGame === name) {
+          const durationMins = (Date.now() - (this._gameStartTime || Date.now())) / 60000;
+          const partial = { durationMins: Math.max(0.1, +durationMins.toFixed(2)) };
+          if (name === "memory" && typeof GameMemory !== "undefined") {
+            partial.attempted = GameMemory.attempts || 0;
+            partial.correct = GameMemory.matched || 0;
+            partial.tier = GameMemory.tier || 1;
+          } else if (name === "routine" && typeof GameRoutine !== "undefined") {
+            partial.attempted = (GameRoutine.slots || []).filter(Boolean).length;
+            partial.correct = partial.attempted;
+            partial.tier = GameRoutine.tier || 1;
+          } else if (name === "attention" && typeof GameAttention !== "undefined") {
+            partial.attempted = GameAttention.foundCount || 0;
+            partial.correct = GameAttention.foundCount || 0;
+            partial.tier = GameAttention.tier || 1;
+          } else if (name === "pattern" && typeof GamePattern !== "undefined") {
+            partial.attempted = GamePattern.currentIndex || 0;
+            partial.correct = GamePattern.correctCount || 0;
+            partial.tier = GamePattern.tier || 1;
+          } else if (name === "categorize" && typeof GameCategorize !== "undefined") {
+            partial.attempted = GameCategorize.currentIdx || 0;
+            partial.correct = (GameCategorize.results || []).filter(r => r.correct).length;
+            partial.tier = GameCategorize.tier || 1;
+          } else if (name === "reminiscence" && typeof GameReminiscence !== "undefined") {
+            partial.attempted = GameReminiscence.currentIndex || 0;
+            partial.correct = GameReminiscence.correctCount || 0;
+            partial.tier = GameReminiscence.tier || 1;
+          }
+          if (typeof SessionLogger !== "undefined") {
+            SessionLogger.logPartialSession(this.patientId, name, name, partial.tier || 1, partial);
+          }
+          this._activeGame = null;
+        }
+
+        this._showView("view-home");
+      });
+    });
+  },
+
+  _wireEndScreen() {
+    const btnAnother = document.getElementById("btn-play-another");
+    const btnDone    = document.getElementById("btn-done-today");
+    if (btnAnother) btnAnother.addEventListener("click", () => this._showView("view-home"));
+    if (btnDone)    btnDone.addEventListener("click",    () => {
+      GameAudio.speak("wellDone");
+      this._showView("view-dashboard");
+    });
+  },
+
+  _wireMuteButtons() {
+    const headerBtn = document.getElementById("btn-toggle-audio-mute");
+    const sidebarBtn = document.getElementById("sidebar-btn-mute");
+    const headerLabel = document.getElementById("mute-label-text");
+    const headerIconUnmuted = headerBtn ? headerBtn.querySelector(".mute-icon-unmuted") : null;
+    const headerIconMuted = headerBtn ? headerBtn.querySelector(".mute-icon-muted") : null;
+
+    const sidebarIcon = document.getElementById("sidebar-mute-icon");
+    const sidebarTitle = document.getElementById("sidebar-mute-title");
+    const sidebarDesc = document.getElementById("sidebar-mute-desc");
+    const sidebarBadge = document.getElementById("sidebar-mute-badge");
+
+    const updateUI = (isMuted) => {
+      // Header button
+      if (headerBtn) {
+        headerBtn.setAttribute("aria-pressed", String(isMuted));
+        if (isMuted) {
+          headerBtn.classList.add("is-muted");
+          headerBtn.setAttribute("aria-label", "Unmute audio guidance");
+          headerBtn.setAttribute("title", "Sound is currently muted (click to unmute)");
+          if (headerLabel) headerLabel.textContent = "Sound: Muted";
+          if (headerIconUnmuted) headerIconUnmuted.style.display = "none";
+          if (headerIconMuted) headerIconMuted.style.display = "inline-flex";
+        } else {
+          headerBtn.classList.remove("is-muted");
+          headerBtn.setAttribute("aria-label", "Mute audio guidance");
+          headerBtn.setAttribute("title", "Sound is on (click to mute)");
+          if (headerLabel) headerLabel.textContent = "Sound: On";
+          if (headerIconUnmuted) headerIconUnmuted.style.display = "inline-flex";
+          if (headerIconMuted) headerIconMuted.style.display = "none";
+        }
+      }
+
+      // Sidebar button
+      if (sidebarBtn) {
+        sidebarBtn.setAttribute("aria-pressed", String(isMuted));
+        if (isMuted) {
+          sidebarBtn.classList.add("is-muted");
+          if (sidebarIcon) sidebarIcon.textContent = "🔇";
+          if (sidebarTitle) sidebarTitle.textContent = "Sound Muted";
+          if (sidebarDesc) sidebarDesc.textContent = "Voice guidance is turned off";
+          if (sidebarBadge) {
+            sidebarBadge.textContent = "Muted";
+            sidebarBadge.style.background = "rgba(239, 68, 68, 0.15)";
+            sidebarBadge.style.color = "#EF4444";
+          }
+        } else {
+          sidebarBtn.classList.remove("is-muted");
+          if (sidebarIcon) sidebarIcon.textContent = "🔊";
+          if (sidebarTitle) sidebarTitle.textContent = "Audio Guidance";
+          if (sidebarDesc) sidebarDesc.textContent = "Sound is currently on";
+          if (sidebarBadge) {
+            sidebarBadge.textContent = "On";
+            sidebarBadge.style.background = "rgba(16, 185, 129, 0.15)";
+            sidebarBadge.style.color = "#059669";
+          }
+        }
+      }
+    };
+
+    if (typeof GameAudio !== "undefined") {
+      updateUI(GameAudio.isMuted);
+
+      const handleToggle = (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        const isMuted = GameAudio.toggleMute();
+        updateUI(isMuted);
+        this.showEncouragement(
+          isMuted
+            ? "🔇 Audio muted. Voice prompts and sounds are off."
+            : "🔊 Audio unmuted. Voice prompts and guidance are on."
+        );
+      };
+
+      if (headerBtn) headerBtn.onclick = handleToggle;
+      if (sidebarBtn) sidebarBtn.onclick = handleToggle;
+
+      window.addEventListener("cdx:audio-mute-changed", (e) => {
+        if (e.detail) updateUI(e.detail.isMuted);
+      });
+    }
+  },
+
+  _wireReminderInterstitial() {
+    const audioBtn = document.getElementById("btn-reminder-audio");
+    if (audioBtn) {
+      audioBtn.addEventListener("click", () => {
+        const audioKey = this._activeReminder ? this._activeReminder.audioKey : "medicineReminder";
+        GameAudio.speak(audioKey);
+      });
+    }
+
+    const doneBtn = document.getElementById("btn-reminder-done");
+    if (doneBtn) {
+      doneBtn.addEventListener("click", () => this._handleReminderDone());
+    }
+
+    const snoozeBtn = document.getElementById("btn-reminder-snooze");
+    if (snoozeBtn) {
+      snoozeBtn.addEventListener("click", () => this._handleReminderSnooze());
+    }
+
+    const banner = document.getElementById("home-due-reminder-banner");
+    if (banner) {
+      banner.addEventListener("click", () => this.showReminderInterstitial());
+      banner.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          this.showReminderInterstitial();
+        }
+      });
+    }
+  },
+
+  _updateHomeReminderBanner() {
+    if (typeof ReminderSync === "undefined") return;
+    const due = ReminderSync.getDueReminder(this.patientId);
+    if (!due) return;
+
+    const bannerMeta = document.getElementById("home-banner-meta");
+    const bannerTitle = document.getElementById("home-banner-title");
+    const bannerDesc = document.getElementById("home-banner-desc");
+    const bannerIcon = document.getElementById("home-banner-icon");
+
+    if (bannerMeta) bannerMeta.textContent = `${due.type} Care Schedule · ${due.time || "Scheduled"}`;
+    if (bannerTitle) bannerTitle.textContent = due.title;
+    if (bannerDesc) bannerDesc.textContent = due.instructions || "Tap to review and confirm with one touch.";
+    if (bannerIcon) bannerIcon.textContent = (due.type || "").toLowerCase() === "medicine" ? "💊" : (due.type || "").toLowerCase() === "hydration" ? "🥛" : "🚶‍♂️";
+  },
+
+  showReminderInterstitial(overrideType = null) {
+    if (typeof ReminderSync === "undefined") return;
+    const reminder = ReminderSync.getDueReminder(this.patientId, overrideType);
+    if (!reminder) return;
+
+    this._activeReminder = reminder;
+
+    const overlay = document.getElementById("patient-reminder-interstitial");
+    const metaTag = document.getElementById("reminder-meta-tag");
+    const titleEl = document.getElementById("rem-modal-title");
+    const instrEl = document.getElementById("reminder-instructions-text");
+    const visualStage = document.getElementById("reminder-visual-stage");
+    const doneText = document.getElementById("btn-reminder-done-text");
+
+    if (metaTag) metaTag.textContent = `${reminder.type} · ${reminder.time || "Scheduled Today"}`;
+    if (titleEl) titleEl.textContent = reminder.title;
+    if (instrEl) instrEl.textContent = reminder.instructions || "Please complete this care step.";
+
+    if (visualStage) {
+      if ((reminder.type || "").toLowerCase() === "medicine") {
+        const isOval = reminder.pillVisual === "oval-yellow";
+        visualStage.innerHTML = `
+          <div class="patient-pill-item-large ${isOval ? "pill-oval" : ""}" id="reminder-pill-graphic">
+            <span class="pill-text-primary">${reminder.pillLabel || "DNP"}</span>
+            <span class="pill-text-dosage">${reminder.dosage || "10mg"}</span>
+          </div>
+        `;
+      } else if ((reminder.type || "").toLowerCase() === "hydration") {
+        visualStage.innerHTML = `<div class="patient-glass-visual">🥛</div>`;
+      } else {
+        visualStage.innerHTML = `<div class="patient-glass-visual">🚶‍♂️</div>`;
+      }
+    }
+
+    if (doneText) {
+      doneText.textContent = (reminder.type || "").toLowerCase() === "medicine"
+        ? "Done, I Took It"
+        : (reminder.type || "").toLowerCase() === "hydration"
+        ? "Done, I Drank Water"
+        : "Done, I Walked";
+    }
+
+    if (overlay) {
+      overlay.style.display = "flex";
+    }
+
+    setTimeout(() => {
+      GameAudio.speak(reminder.audioKey || "medicineReminder");
+    }, 350);
+  },
+
+  _handleReminderDone() {
+    if (this._activeReminder && typeof ReminderSync !== "undefined") {
+      ReminderSync.acknowledgeReminder(this.patientId, this._activeReminder);
+    }
+
+    const overlay = document.getElementById("patient-reminder-interstitial");
+    if (overlay) overlay.style.display = "none";
+
+    GameAudio.speak("reminderAcknowledged");
+    this.showEncouragement("✓ Marked as completed! Thank you for staying on track today.");
+
+    this._renderPatientDashboard();
+    this._renderRemindersView();
+  },
+
+  _handleReminderSnooze() {
+    if (this._activeReminder && typeof ReminderSync !== "undefined") {
+      ReminderSync.setReminderStatus(this.patientId, this._activeReminder.id, "postponed");
+    }
+
+    const overlay = document.getElementById("patient-reminder-interstitial");
+    if (overlay) overlay.style.display = "none";
+
+    GameAudio.speak("reminderPostponed");
+    this.showEncouragement("Reminder postponed for 10 minutes. Take your time.");
+
+    this._renderPatientDashboard();
+    this._renderRemindersView();
+  },
+
+  _startGame(name) {
+    this._activeGame = name;
+    this._gameStartTime = Date.now();
+    const viewId = `view-${name}`;
+    this._showView(viewId);
+
+    switch (name) {
+      case "memory":       GameMemory.init(this.patientId, this.patient);       break;
+      case "routine":      GameRoutine.init(this.patientId, this.patient);      break;
+      case "attention":    GameAttention.init(this.patientId, this.patient);    break;
+      case "pattern":      GamePattern.init(this.patientId, this.patient);      break;
+      case "categorize":   GameCategorize.init(this.patientId, this.patient);   break;
+      case "reminiscence": GameReminiscence.init(this.patientId, this.patient); break;
+    }
+  },
+
+  _showView(viewId) {
+    document.querySelectorAll(".game-view").forEach(v => v.classList.remove("active"));
+    const target = document.getElementById(viewId);
+    if (target) {
+      target.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    this._activeView = viewId;
+    if (viewId === "view-home" && typeof GameOrientation !== "undefined") {
+      GameOrientation.render("orientation-board-container", this.patient);
+    }
+    if (typeof this._updateNavActive === "function") {
+      let navTarget = null;
+      if (viewId === "view-home") {
+        navTarget = document.getElementById("nav-btn-activities");
+      } else if (viewId === "view-dashboard") {
+        navTarget = document.getElementById("nav-btn-dashboard");
+      } else if (viewId === "view-reminders") {
+        navTarget = document.getElementById("nav-btn-reminders");
+      } else if (viewId === "view-calendar") {
+        navTarget = document.getElementById("nav-btn-calendar");
+      }
+      if (navTarget) {
+        this._updateNavActive(navTarget);
+      }
+    }
+  },
+
+  showEncouragement(text) {
+    const toast = document.getElementById("encourage-toast");
+    if (!toast) return;
+    toast.textContent = text;
+    toast.classList.add("show");
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
+  },
+
+  showEndScreen({ gameName, lines }) {
+    this._activeGame = null;
+    GameAudio.speak("wellDone");
+
+    if (typeof ReminderSync !== "undefined") {
+      const detailStr = (lines || []).map(l => `${l.label}: ${l.value}`).join(" · ");
+      ReminderSync.logPatientActivity(this.patientId, {
+        type: "Brain Activity",
+        category: "Cognition",
+        title: gameName || "Brain Exercise",
+        details: detailStr || "Completed exercise session",
+        icon: "🧠"
+      });
+    }
+
+    const heading = document.getElementById("end-heading");
+    if (heading) heading.textContent = `Well played today!`;
+
+    const subtext = document.getElementById("end-subtext");
+    if (subtext) subtext.textContent =
+      `You completed ${gameName} beautifully. Your progress has been saved for your doctor.`;
+
+    const list = document.getElementById("end-summary-list");
+    if (list) {
+      list.innerHTML = lines.map(l => `
+        <li class="result-summary-item">
+          <span>${l.label}</span>
+          <span class="result-summary-val">${l.value}</span>
+        </li>
+      `).join("");
+    }
+
+    setTimeout(() => this._showView("view-end"), 300);
+  },
+
+  /* ============================================================
+     PATIENT DAILY ACTIVITY CALENDAR & TIMELINE VIEWER
+     ============================================================ */
+  _calYear: null,
+  _calMonth: null,
+  _calSelectedDate: null,
+
+  _renderActivityCalendar(targetYear, targetMonth) {
+    const grid = document.getElementById("calendar-days-grid");
+    const monthTitle = document.getElementById("cal-month-name");
+    if (!grid || typeof ReminderSync === "undefined") return;
+
+    const now = new Date();
+    if (targetYear === undefined || targetYear === null) {
+      this._calYear = this._calYear || now.getFullYear();
+      this._calMonth = (this._calMonth !== null && this._calMonth !== undefined) ? this._calMonth : now.getMonth();
+    } else {
+      this._calYear = targetYear;
+      this._calMonth = targetMonth;
+    }
+
+    const year = this._calYear;
+    const month = this._calMonth;
+
+    const todayStr = ReminderSync.getTodayDateStr();
+    if (!this._calSelectedDate) {
+      this._calSelectedDate = todayStr;
+    }
+
+    // Month display name
+    const monthDateObj = new Date(year, month, 1);
+    const monthName = monthDateObj.toLocaleDateString([], { month: "long", year: "numeric" });
+    if (monthTitle) monthTitle.textContent = monthName;
+
+    // Days calculation
+    const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Sun
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
+
+    // Fetch all patient activities
+    const allActivities = ReminderSync.getPatientDailyActivities(this.patientId);
+
+    // Group activities by date string "YYYY-MM-DD"
+    const actByDate = {};
+    allActivities.forEach(a => {
+      if (!actByDate[a.date]) actByDate[a.date] = [];
+      actByDate[a.date].push(a);
+    });
+
+    let cellsHtml = "";
+
+    // 1. Padding days from previous month
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const dayNum = prevMonthDays - i;
+      const prevM = month === 0 ? 11 : month - 1;
+      const prevY = month === 0 ? year - 1 : year;
+      const dateStr = `${prevY}-${String(prevM + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+      const dayActs = actByDate[dateStr] || [];
+
+      cellsHtml += this._generateDayCellHtml({
+        dayNum,
+        dateStr,
+        isOtherMonth: true,
+        isToday: dateStr === todayStr,
+        isSelected: dateStr === this._calSelectedDate,
+        dayActs
+      });
+    }
+
+    // 2. Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const dayActs = actByDate[dateStr] || [];
+
+      cellsHtml += this._generateDayCellHtml({
+        dayNum: d,
+        dateStr,
+        isOtherMonth: false,
+        isToday: dateStr === todayStr,
+        isSelected: dateStr === this._calSelectedDate,
+        dayActs
+      });
+    }
+
+    // 3. Padding days for next month to fill grid (total % 7 === 0)
+    const totalFilled = firstDayIndex + daysInMonth;
+    const remaining = (7 - (totalFilled % 7)) % 7;
+    for (let n = 1; n <= remaining; n++) {
+      const nextM = month === 11 ? 0 : month + 1;
+      const nextY = month === 11 ? year + 1 : year;
+      const dateStr = `${nextY}-${String(nextM + 1).padStart(2, '0')}-${String(n).padStart(2, '0')}`;
+      const dayActs = actByDate[dateStr] || [];
+
+      cellsHtml += this._generateDayCellHtml({
+        dayNum: n,
+        dateStr,
+        isOtherMonth: true,
+        isToday: dateStr === todayStr,
+        isSelected: dateStr === this._calSelectedDate,
+        dayActs
+      });
+    }
+
+    grid.innerHTML = cellsHtml;
+
+    // Attach click handlers to day cells
+    grid.querySelectorAll(".calendar-day-cell").forEach(cell => {
+      cell.addEventListener("click", () => {
+        const dStr = cell.getAttribute("data-date");
+        this._calSelectedDate = dStr;
+        grid.querySelectorAll(".calendar-day-cell").forEach(c => c.classList.remove("is-selected"));
+        cell.classList.add("is-selected");
+        this._renderDayInspector(dStr);
+      });
+    });
+
+    // Wire month prev / next / today buttons if not already wired
+    this._wireCalendarControls();
+
+    // Render inspector for the selected date
+    this._renderDayInspector(this._calSelectedDate);
+  },
+
+  _generateDayCellHtml({ dayNum, dateStr, isOtherMonth, isToday, isSelected, dayActs }) {
+    let dotsHtml = "";
+    if (dayActs.length > 0) {
+      const hasMed = dayActs.some(a => a.type === "Medication" || a.type === "Medicine");
+      const hasGame = dayActs.some(a => a.type === "Brain Activity" || a.category === "Cognition");
+      const hasMood = dayActs.some(a => a.type === "Mood Check-In" || a.category === "Well-Being");
+      const hasRoutine = dayActs.some(a => a.type === "Gentle Orientation" || a.category === "Orientation" || a.category === "Care");
+
+      if (hasMed) dotsHtml += `<span class="act-dot dot-med" title="Medicine Taken"></span>`;
+      if (hasGame) dotsHtml += `<span class="act-dot dot-game" title="Brain Activity"></span>`;
+      if (hasMood) dotsHtml += `<span class="act-dot dot-mood" title="Mood Check-In"></span>`;
+      if (hasRoutine && !hasMed && !hasGame) dotsHtml += `<span class="act-dot dot-routine" title="Daily Care"></span>`;
+    }
+
+    const classes = [
+      "calendar-day-cell",
+      isOtherMonth ? "is-other-month" : "",
+      isToday ? "is-today" : "",
+      isSelected ? "is-selected" : ""
+    ].filter(Boolean).join(" ");
+
+    return `
+      <div class="${classes}" data-date="${dateStr}" role="button" tabindex="0" aria-label="${dateStr} - ${dayActs.length} activities">
+        <div class="day-cell-top">
+          <span class="day-cell-num">${dayNum}</span>
+          ${isToday ? `<span class="day-today-chip">Today</span>` : ""}
+        </div>
+        <div class="day-activity-dots">
+          ${dotsHtml}
+        </div>
+      </div>
+    `;
+  },
+
+  _wireCalendarControls() {
+    if (this._calendarControlsWired) return;
+    this._calendarControlsWired = true;
+
+    const btnPrev = document.getElementById("btn-cal-prev");
+    const btnNext = document.getElementById("btn-cal-next");
+    const btnToday = document.getElementById("btn-cal-today");
+
+    if (btnPrev) {
+      btnPrev.addEventListener("click", () => {
+        let m = this._calMonth - 1;
+        let y = this._calYear;
+        if (m < 0) { m = 11; y -= 1; }
+        this._renderActivityCalendar(y, m);
+      });
+    }
+
+    if (btnNext) {
+      btnNext.addEventListener("click", () => {
+        let m = this._calMonth + 1;
+        let y = this._calYear;
+        if (m > 11) { m = 0; y += 1; }
+        this._renderActivityCalendar(y, m);
+      });
+    }
+
+    if (btnToday) {
+      btnToday.addEventListener("click", () => {
+        const now = new Date();
+        this._calSelectedDate = ReminderSync.getTodayDateStr();
+        this._renderActivityCalendar(now.getFullYear(), now.getMonth());
+      });
+    }
+  },
+
+  _renderDayInspector(dateStr) {
+    const headingEl = document.getElementById("inspector-date-heading");
+    const badgeEl = document.getElementById("inspector-day-badge");
+    const tallyCountEl = document.getElementById("inspector-tally-count");
+    const listEl = document.getElementById("inspector-activities-list");
+    const statMeds = document.getElementById("inspector-stat-meds");
+    const statGames = document.getElementById("inspector-stat-games");
+    const statMood = document.getElementById("inspector-stat-mood");
+
+    if (!listEl || typeof ReminderSync === "undefined") return;
+
+    const todayStr = ReminderSync.getTodayDateStr();
+    const isToday = dateStr === todayStr;
+
+    // Format human readable date
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const datePretty = dateObj.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric", year: "numeric" });
+
+    if (headingEl) headingEl.textContent = datePretty;
+    if (badgeEl) badgeEl.textContent = isToday ? "TODAY'S RECORD" : "HISTORICAL LOG";
+
+    const dayActivities = ReminderSync.getActivitiesForDate(this.patientId, dateStr);
+
+    if (tallyCountEl) tallyCountEl.textContent = dayActivities.length;
+
+    // Count statistics
+    const medsCount = dayActivities.filter(a => a.type === "Medication" || a.type === "Medicine").length;
+    const gamesCount = dayActivities.filter(a => a.type === "Brain Activity" || a.category === "Cognition").length;
+    const moodCount = dayActivities.filter(a => a.type === "Mood Check-In" || a.category === "Well-Being").length;
+
+    if (statMeds) statMeds.textContent = medsCount;
+    if (statGames) statGames.textContent = gamesCount;
+    if (statMood) statMood.textContent = moodCount;
+
+    if (dayActivities.length === 0) {
+      listEl.innerHTML = `
+        <div class="inspector-empty-state">
+          <div class="empty-state-icon">🗓️</div>
+          <div class="empty-state-title">No Recorded Activities</div>
+          <div class="empty-state-sub">No medications or brain sessions logged on ${datePretty}.</div>
+          ${isToday ? `
+            <div style="margin-top: 14px; display: flex; justify-content: center; gap: 8px;">
+              <button class="btn-med-done" onclick="GameApp._showView('view-home')" style="padding: 6px 14px; font-size: 0.8125rem;">
+                <span>Start Exercise Now</span>
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = dayActivities.map(act => {
+      let iconBoxClass = "icon-box-care";
+      if (act.type === "Medication" || act.type === "Medicine") iconBoxClass = "icon-box-med";
+      else if (act.type === "Brain Activity" || act.category === "Cognition") iconBoxClass = "icon-box-game";
+      else if (act.type === "Mood Check-In") iconBoxClass = "icon-box-mood";
+
+      const icon = act.icon || (act.type === "Medication" ? "💊" : act.type === "Brain Activity" ? "🧠" : "✅");
+
+      return `
+        <div class="inspector-act-card">
+          <div class="act-card-icon-box ${iconBoxClass}">
+            <span>${icon}</span>
+          </div>
+          <div class="act-card-body">
+            <div class="act-card-meta">
+              <span class="act-card-time">${act.time || "Scheduled"}</span>
+              <span class="act-card-badge">${act.type || "Activity"}</span>
+            </div>
+            <div class="act-card-title">${act.title}</div>
+            <div class="act-card-desc">${act.details || "Recorded in daily health log"}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+};
+
+// Boot
+document.addEventListener("DOMContentLoaded", () => GameApp.init());
+</script>
+
+  <!-- ═══════════════════════════════════════════════
+       FLOATING LANDING PAGE BUTTON (BOTTOM-RIGHT)
+       ═══════════════════════════════════════════════ -->
+  <a href="/landing.html" id="btn-go-to-landing" class="btn-go-landing" aria-label="Go to Landing Page" title="Back to Home">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <span>Home</span>
+  </a>
+
+</body>
+</html>

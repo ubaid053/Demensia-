@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroSync | Clinician Tele-Cognitive Registry &amp; Care Platform</title>
+  <meta name="description" content="NeuroSync — Hospital-grade electronic cognitive health and tele-cognitive care platform for clinicians · GMCH Regional Memory Unit.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="stylesheet" href="css/styles.css?v=3.0">
+</head>
+<body>
+
+  <!-- =========================================================================
+       CLINICAL NAVIGATION DRAWER (LEFT SLIDING BAR) & BACKDROP
+       ========================================================================= -->
+  <div id="clinician-sidebar-overlay" class="clinician-sidebar-overlay" aria-hidden="true"></div>
+
+  <aside id="clinician-sidebar" class="clinician-sidebar sidebar" role="dialog" aria-modal="true" aria-label="Clinical Navigation Drawer" aria-hidden="true">
+    <div class="clinician-sidebar-header">
+      <div class="clinician-sidebar-brand">
+        <div class="hospital-icon-box" aria-hidden="true" style="width: 38px; height: 38px; background: transparent; padding: 0;">
+          <!-- Official NeuroSync Emblem Image (Without Text) -->
+          <img src="/assets/logo.png" alt="NeuroSync Logo" class="brand-logo-img" width="38" height="38">
+        </div>
+        <div class="label">
+          <div class="clinician-sidebar-title">NeuroSync</div>
+          <div class="clinician-sidebar-sub">GMCH Memory Unit · Registry Node 03</div>
+        </div>
+      </div>
+      <button type="button" id="btn-close-clinician-sidebar" class="btn-sidebar-collapse" aria-label="Close Navigation Menu" title="Close Menu (Esc)">
+        <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <nav class="clinician-sidebar-nav" aria-label="EHR View Navigation">
+      <div class="sidebar-section-title label">EHR CORE VIEWS</div>
+
+      <ul class="nav" id="doctor-nav-list">
+        <li class="indicator" aria-hidden="true"></li>
+        <li>
+          <button type="button" id="nav-roster" class="sidebar-nav-item nav-link active" data-view="roster">
+            <div class="nav-item-icon-box">
+              <svg class="clinical-icon lucide" width="18" height="18" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </div>
+            <div class="nav-item-content label">
+              <span class="nav-item-title">Patient Roster</span>
+              <span class="nav-item-desc">Elderly dementia registry cohort</span>
+            </div>
+            <span class="nav-item-badge label">Active</span>
+          </button>
+        </li>
+
+        <li>
+          <button type="button" id="nav-caregiver" class="sidebar-nav-item nav-link" data-view="caregiver" title="Caregiver Support, Reminders &amp; Adherence Dashboard">
+            <div class="nav-item-icon-box">
+              <svg class="clinical-icon lucide" width="18" height="18" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="nav-item-content label">
+              <span class="nav-item-title">Caregiver Dashboard</span>
+              <span class="nav-item-desc">Medication adherence &amp; notes</span>
+            </div>
+          </button>
+        </li>
+
+        <li>
+          <button type="button" id="nav-analytics" class="sidebar-nav-item nav-link" data-view="analytics">
+            <div class="nav-item-icon-box">
+              <svg class="clinical-icon lucide" width="18" height="18" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div class="nav-item-content label">
+              <span class="nav-item-title">Analytics Overview</span>
+              <span class="nav-item-desc">Regional metrics &amp; cognitive curves</span>
+            </div>
+          </button>
+        </li>
+
+        <li>
+          <button type="button" id="nav-game-analytics" class="sidebar-nav-item nav-link" data-view="game-analytics" title="Patient-Specific Game Analytics, Progress Tracking &amp; Reports">
+            <div class="nav-item-icon-box">
+              <svg class="clinical-icon lucide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <div class="nav-item-content label">
+              <span class="nav-item-title">Game Analytics &amp; Reports</span>
+              <span class="nav-item-desc">Domain breakdowns &amp; responses</span>
+            </div>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="clinician-sidebar-footer">
+      <div class="sidebar-registry-badge">
+        <div class="badge-dot-live"></div>
+        <div>
+          <div class="badge-title">NER Registry Node 03 · Guwahati</div>
+          <div class="badge-sub">DISHA &amp; DPDP Act 2026 Compliant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- FLOATING EDGE TAB TO OPEN SIDEBAR WHEN SCROLLING (LEFT SIDE) -->
+  <button type="button" id="btn-float-open-clinician-sidebar" class="btn-float-open-clinician-sidebar" aria-label="Open Navigation Menu" title="Open Navigation Menu">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+    <span>Menu</span>
+  </button>
+
+  <!-- PERSISTENT CLINICAL TOP NAVIGATION (CLEAN, MINIMAL & LUXURY) -->
+  <header class="clinical-nav" role="banner">
+    <div class="nav-left">
+      <!-- Interactive Logo / Brand Mark (Returns to Patient Roster within Doctor Interface) -->
+      <a href="javascript:void(0)" id="header-brand-return-roster" class="hospital-emblem-wrap" style="text-decoration: none; cursor: pointer;" title="Return to Patient Roster">
+        <div class="hospital-logo-mark" aria-hidden="true" title="NeuroSync Regional Memory Unit">
+          <!-- Official NeuroSync Emblem Image (Without Text) -->
+          <img src="/assets/logo.png" alt="NeuroSync Logo" class="brand-logo-img" width="38" height="38">
+        </div>
+        <div class="hospital-titles">
+          <span class="hospital-title-main">NeuroSync · Clinician Portal</span>
+          <span class="hospital-title-sub">Clinical Tele-Cognitive Network · GMCH Regional Memory Unit</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="nav-right">
+      <!-- Doctor Profile Option (Interactive Chip / Modal Trigger) -->
+      <button type="button" id="btn-doctor-profile" class="btn-doctor-profile-chip" aria-haspopup="dialog" aria-expanded="false" title="View Doctor Clinical Profile &amp; Station Details">
+        <div class="doctor-avatar-wrap">
+          <div class="doctor-avatar-circle" id="header-doctor-avatar">PB</div>
+          <span class="doctor-online-pulse" title="Active Station Token Verified"></span>
+        </div>
+        <div class="doctor-profile-chip-text">
+          <span class="doctor-chip-badge">Attending</span>
+          <span class="doctor-chip-label" id="header-doctor-name">Dr. Priyam Borah, MD</span>
+        </div>
+        <svg class="doctor-chip-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+
+      <!-- Attractive, Stylish Sign Out Button -->
+      <a href="/landing.html" id="btn-doctor-logout" class="btn-doctor-signout-stylish" title="Sign Out of Doctor Session &amp; Return to Landing Page">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Sign Out</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- SUBTLE NER TEXTILE WEAVE ACCENT RIBBON -->
+  <div class="ner-cultural-ribbon" aria-hidden="true"></div>
+
+  <!-- AUTHENTICATED CLINICAL SESSION BANNER -->
+  <div id="doctor-session-banner" class="doctor-session-banner">
+    <div class="doctor-session-info">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <span><strong>Active Clinical Session:</strong> NeuroSync Tele-Cognitive Registry · GMCH Unit 3 Neurology Node</span>
+    </div>
+    <div class="doctor-session-actions">
+      <span class="session-badge-node">Registry Node 03 Active</span>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION VIEWPORT -->
+  <main class="app-viewport" role="main">
+
+    <!-- =========================================================================
+         VIEW 1: PATIENT ROSTER (MAIN HOME VIEW)
+         ========================================================================= -->
+    <section id="view-roster" class="dashboard-view active" aria-label="Patient Roster View">
+      
+      <div class="roster-header-row">
+        <div class="roster-title-block">
+          <div class="roster-dept-tag">
+            <span class="roster-dept-pulse"></span>
+            <span>GMCH REGIONAL NEUROLOGY REGISTRY · COHORT 03</span>
+          </div>
+          <h1>Clinical Patient Roster</h1>
+          <p>Systematic longitudinal monitoring of elderly dementia patients across North-Eastern regional clusters.</p>
+        </div>
+        
+        <div class="roster-header-actions">
+          <span id="roster-count-badge" class="roster-count-badge" title="Filtered active registry records">
+            8 Patient Records Filtered (8 Total Registered)
+          </span>
+          <button id="btn-open-intake" class="btn-clinical btn-intake-elevated" title="Add a new patient record to the clinical registry">
+            <svg class="clinical-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            <span>New Patient Intake</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Functional Filter & Search Toolbar (Sleek Command Bar) -->
+      <div class="roster-toolbar">
+        <div class="toolbar-search-row">
+          <div class="roster-search-field">
+            <div class="search-field-icon-badge">
+              <svg class="search-field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <input type="text" id="roster-search-input" class="roster-search-input" placeholder="Search by patient name, UHID, or district..." aria-label="Search patient registry">
+            <button type="button" id="btn-clear-search" class="search-clear-btn" aria-label="Clear Search Input" title="Clear Search" style="display: none;">✕</button>
+            <div class="search-kbd-hint"><kbd>Ctrl</kbd><kbd>K</kbd></div>
+          </div>
+          <button id="btn-reset-filters" class="filter-reset-btn" title="Reset all search queries and dropdown filters">
+            <svg class="reset-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+            <span>Reset All Filters</span>
+          </button>
+        </div>
+
+        <div class="toolbar-filters-row">
+          <!-- Status Filter -->
+          <div class="filter-item" data-filter="status">
+            <label for="roster-filter-status" class="filter-label">
+              <div class="filter-label-group">
+                <div class="filter-category-icon-box status-tint">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <span class="filter-label-text">Clinical Status</span>
+              </div>
+              <span class="filter-dot-indicator"></span>
+            </label>
+            <div class="select-custom-wrapper">
+              <div class="select-leading-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <select id="roster-filter-status" class="filter-select">
+                <option value="all">All Clinical Statuses</option>
+                <option value="alert">Alert Only</option>
+                <option value="attention">Needs Attention Only</option>
+                <option value="stable">Stable Only</option>
+              </select>
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- District Filter -->
+          <div class="filter-item" data-filter="district">
+            <label for="roster-filter-district" class="filter-label">
+              <div class="filter-label-group">
+                <div class="filter-category-icon-box district-tint">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <span class="filter-label-text">District</span>
+              </div>
+              <span class="filter-dot-indicator"></span>
+            </label>
+            <div class="select-custom-wrapper">
+              <div class="select-leading-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <select id="roster-filter-district" class="filter-select"></select>
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- Language Filter -->
+          <div class="filter-item" data-filter="language">
+            <label for="roster-filter-language" class="filter-label">
+              <div class="filter-label-group">
+                <div class="filter-category-icon-box language-tint">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+                </div>
+                <span class="filter-label-text">Language</span>
+              </div>
+              <span class="filter-dot-indicator"></span>
+            </label>
+            <div class="select-custom-wrapper">
+              <div class="select-leading-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+              </div>
+              <select id="roster-filter-language" class="filter-select"></select>
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <!-- Health Worker Filter -->
+          <div class="filter-item" data-filter="hw">
+            <label for="roster-filter-hw" class="filter-label">
+              <div class="filter-label-group">
+                <div class="filter-category-icon-box hw-tint">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span class="filter-label-text">Health Worker</span>
+              </div>
+              <span class="filter-dot-indicator"></span>
+            </label>
+            <div class="select-custom-wrapper">
+              <div class="select-leading-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <select id="roster-filter-hw" class="filter-select"></select>
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dense Systematic Patient Table -->
+      <div class="roster-table-wrap">
+        <table class="roster-table">
+          <thead>
+            <tr>
+              <th class="sortable-th" data-sort="name">Patient &amp; UHID ↕</th>
+              <th>District &amp; Dialect</th>
+              <th class="sortable-th" data-sort="status">Clinical Status ↕</th>
+              <th class="sortable-th" data-sort="lastSession">Last Session ↕</th>
+              <th class="sortable-th" data-sort="adherence">Adherence % ↕</th>
+              <th>Cognitive Trend</th>
+              <th>Assigned Health Worker</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="roster-table-body">
+            <!-- Dynamic Injection via ClinicalApp.renderRoster() -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- =========================================================================
+         VIEW 2: INDIVIDUAL PATIENT RECORD (DETAIL EHR-LITE VIEW)
+         ========================================================================= -->
+    <section id="view-patient-detail" class="dashboard-view" aria-label="Patient Detail Record">
+      
+      <!-- Detail Top Navigation / Breadcrumbs -->
+      <div class="detail-top-nav">
+        <button id="btn-back-to-roster" class="btn-back-roster" title="Return to Clinical Patient Roster">
+          <svg class="clinical-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          <span>Back to Patient Roster</span>
+        </button>
+
+        <div id="detail-breadcrumb-text" class="detail-breadcrumbs">
+          Patient Roster / <strong>Patient Name</strong> (NER-0000-000)
+        </div>
+      </div>
+
+      <!-- Systematic EHR Patient Header Block -->
+      <div class="ehr-header-block">
+        <div class="ehr-header-primary">
+          <div class="ehr-patient-title">
+            <div style="display: flex; align-items: baseline; gap: var(--space-3);">
+              <h2 id="ehr-patient-name">Patient Full Name</h2>
+              <span id="ehr-patient-id" class="mono-num" style="font-size: 0.875rem; color: var(--color-text-muted);">#NER-0000-000</span>
+            </div>
+            <div class="ehr-patient-meta">
+              <span id="ehr-patient-demog">Age / Gender • District</span>
+              <span>•</span>
+              <span id="ehr-status-chip" class="status-chip chip-stable">Stable</span>
+            </div>
+          </div>
+
+          <div class="ehr-header-actions">
+            <button id="btn-jump-to-calendar" class="btn-clinical-secondary" title="View Patient Daily Activity &amp; Care Calendar">
+              <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Care Calendar &darr;</span>
+            </button>
+            <button id="btn-view-patient-analytics" class="btn-clinical" title="View Patient Game Analytics &amp; Cognitive Reports">
+              <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              <span>Cognitive Analytics &amp; Reports &rarr;</span>
+            </button>
+            <button id="btn-jump-to-report" class="btn-clinical-secondary" title="View detailed Clinical Performance Report below">
+              <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <span>Performance Report &darr;</span>
+            </button>
+            <button id="btn-edit-patient" class="btn-clinical-secondary" title="Edit this patient's core clinical record">
+              <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Edit Core Record</span>
+            </button>
+            <button id="btn-export-ehr-summary" class="ehr-export-btn" title="Generate printable / referral summary">
+              <svg class="clinical-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              <span>Export Report (PDF)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="ehr-metadata-grid">
+          <div class="meta-field">
+            <span class="meta-field-label">District / Location in NER</span>
+            <span id="ehr-district-val" class="meta-field-value">Kamrup Metro (Assam)</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-field-label">Primary Dialect / Language</span>
+            <span id="ehr-lang-val" class="meta-field-value">Assamese</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-field-label">Assigned Primary Caregiver</span>
+            <span id="ehr-caregiver-val" class="meta-field-value">Caregiver Details</span>
+          </div>
+          <div class="meta-field">
+            <span class="meta-field-label">Assigned Health Worker (ASHA/CHO)</span>
+            <span id="ehr-hw-val" class="meta-field-value">Health Worker Details</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Clinical Core Layout (2 Columns) -->
+      <div class="detail-content-grid">
+        
+        <!-- Primary Left Column: Patient Daily Care Calendar & Cognitive Performance -->
+        <div class="detail-col-primary">
+          
+          <!-- Patient Daily Activity & Care Calendar (Doctor Inspection Panel) -->
+          <div class="clinical-panel" id="ehr-patient-calendar-panel">
+            <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
+              <div>
+                <span id="doc-cal-patient-label" class="panel-title">🗓️ Patient Daily Care &amp; Activity Calendar</span>
+                <span class="panel-badge-teal">Personal Longitudinal Record</span>
+              </div>
+              <span style="font-size: 0.75rem; color: var(--color-text-secondary);">
+                Medications taken, cognitive exercises, mood logs &amp; daily care
+              </span>
+            </div>
+
+            <div class="patient-calendar-layout doc-calendar-layout">
+              <!-- Calendar Controls & Grid -->
+              <div class="calendar-card-panel doc-calendar-card">
+                <div class="calendar-controls-bar">
+                  <div class="calendar-month-display">
+                    <span id="doc-cal-month-name" class="cal-month-title">September 2026</span>
+                  </div>
+                  <div class="cal-nav-buttons">
+                    <button type="button" id="btn-doc-cal-prev" class="cal-btn-nav" aria-label="Previous Month">&larr; Prev</button>
+                    <button type="button" id="btn-doc-cal-today" class="cal-btn-today" aria-label="Go to Today">Today</button>
+                    <button type="button" id="btn-doc-cal-next" class="cal-btn-nav" aria-label="Next Month">Next &rarr;</button>
+                  </div>
+                </div>
+
+                <div class="calendar-weekdays-row">
+                  <span>Sun</span>
+                  <span>Mon</span>
+                  <span>Tue</span>
+                  <span>Wed</span>
+                  <span>Thu</span>
+                  <span>Fri</span>
+                  <span>Sat</span>
+                </div>
+
+                <div id="doc-calendar-days-grid" class="calendar-days-grid">
+                  <!-- Rendered dynamically for this open patient -->
+                </div>
+
+                <div class="calendar-legend-bar">
+                  <div class="legend-item"><span class="leg-dot dot-med"></span><span>Medicines Taken</span></div>
+                  <div class="legend-item"><span class="leg-dot dot-game"></span><span>Brain Games Played</span></div>
+                  <div class="legend-item"><span class="leg-dot dot-mood"></span><span>Mood Logs</span></div>
+                  <div class="legend-item"><span class="leg-dot dot-routine"></span><span>Care Routine</span></div>
+                </div>
+              </div>
+
+              <!-- Day Inspector Panel -->
+              <div class="calendar-day-inspector-panel doc-inspector-card">
+                <div class="inspector-header">
+                  <div class="inspector-date-box">
+                    <div class="inspector-badge" id="doc-inspector-badge">Patient Record</div>
+                    <h3 id="doc-inspector-date-heading" class="inspector-date-heading">Today</h3>
+                  </div>
+                  <div class="inspector-tally-pill" id="doc-inspector-tally-pill">
+                    <span id="doc-inspector-tally-count">0</span> Activities
+                  </div>
+                </div>
+
+                <div class="inspector-stats-row">
+                  <div class="inspector-mini-stat">
+                    <span class="stat-emoji">💊</span>
+                    <div class="stat-info">
+                      <span class="stat-num" id="doc-inspector-stat-meds">0</span>
+                      <span class="stat-lbl">Meds Taken</span>
+                    </div>
+                  </div>
+                  <div class="inspector-mini-stat">
+                    <span class="stat-emoji">🧠</span>
+                    <div class="stat-info">
+                      <span class="stat-num" id="doc-inspector-stat-games">0</span>
+                      <span class="stat-lbl">Brain Games</span>
+                    </div>
+                  </div>
+                  <div class="inspector-mini-stat">
+                    <span class="stat-emoji">😊</span>
+                    <div class="stat-info">
+                      <span class="stat-num" id="doc-inspector-stat-mood">0</span>
+                      <span class="stat-lbl">Mood Logs</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="inspector-timeline-section">
+                  <div class="inspector-section-label">RECORDED ACTIVITIES FOR THIS DAY</div>
+                  <div id="doc-inspector-activities-list" class="inspector-activities-list">
+                    <!-- Populated dynamically via renderDoctorPatientCalendar() -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cognitive Performance Section -->
+          <div class="clinical-panel">
+            <div class="panel-header">
+              <span class="panel-title">Cognitive Performance Trends</span>
+              
+              <!-- Time Range Selector -->
+              <div class="time-range-group" role="group" aria-label="Evaluation Time Range">
+                <button class="time-range-btn" data-range="7d">7 Days</button>
+                <button class="time-range-btn active" data-range="30d">30 Days</button>
+                <button class="time-range-btn" data-range="90d">90 Days</button>
+              </div>
+            </div>
+
+            <!-- Game Module Selector Tabs -->
+            <div class="module-tabs" role="tablist" aria-label="Game Module Selection">
+              <button class="module-tab-btn active" data-module="memory">Memory &amp; Word Association</button>
+              <button class="module-tab-btn" data-module="attention">Sustained Attention &amp; Reaction</button>
+              <button class="module-tab-btn" data-module="routineRecall">Daily Routine Sequencing</button>
+              <button class="module-tab-btn" data-module="patternRecognition">Pattern Recognition</button>
+            </div>
+
+            <!-- Dynamic SVG Module Chart Container -->
+            <div id="cognitive-trend-chart-container" style="background: var(--color-surface-raised); border: 1px solid #ECE7DB; border-radius: 2px; padding: var(--space-3);">
+              <!-- Rendered via ClinicalCharts.renderModuleTrendChart() -->
+            </div>
+          </div>
+
+          <!-- Session History Log Section -->
+          <div class="clinical-panel">
+            <div class="panel-header">
+              <span class="panel-title">Chronological Session History</span>
+              <span style="font-size: 0.6875rem; color: var(--color-text-muted); font-family: var(--font-mono);">Recorded via Tablet &amp; ASHA Sync</span>
+            </div>
+            <table class="session-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Duration</th>
+                  <th>Games Played</th>
+                  <th>Composite Score</th>
+                  <th>Difficulty Tier</th>
+                </tr>
+              </thead>
+              <tbody id="session-history-tbody">
+                <!-- Injected via ClinicalApp.renderSessionHistory() -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Clinical Observations & Free-Text Notes (Doctor-Only) -->
+          <div class="clinical-panel">
+            <div class="panel-header">
+              <div>
+                <span class="panel-title">Clinical Notes &amp; Observations</span>
+                <span style="font-size: 0.6875rem; color: var(--color-brand-primary); font-weight: 600; margin-left: 8px;">(Doctor-Only Private Record)</span>
+              </div>
+            </div>
+            <div class="notes-container">
+              <textarea id="doctor-note-textarea" class="note-input-area" placeholder="Enter diagnostic observations, medication adjustments, or clinical directives..." aria-label="Clinical observation entry"></textarea>
+              <button id="btn-save-doctor-note" class="btn-save-note">Save Clinical Note</button>
+              
+              <div id="ehr-saved-notes-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                <!-- Injected via ClinicalApp.renderClinicalNotes() -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Secondary Right Column: Alerts/Flags & Reminders -->
+        <div class="detail-col-secondary">
+          
+          <!-- AI Alerts & Clinical Flags Panel (ANCHOR OF PAGE) -->
+          <div class="clinical-panel panel-anchor-alerts">
+            <div class="panel-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg class="clinical-icon" width="16" height="16" viewBox="0 0 24 24" style="stroke: var(--color-brand-primary);">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span class="panel-title">Clinical Flags &amp; Decline Alerts</span>
+              </div>
+              <span style="font-size: 0.6875rem; color: var(--color-text-secondary); font-weight: 600;">Priority Anchor</span>
+            </div>
+            <div style="margin-bottom: var(--space-3);">
+              <span class="ai-honest-framing-caption">AI-assisted pattern detection — not a diagnosis. Always confirm with clinical assessment.</span>
+            </div>
+            <div id="ehr-flags-list" class="flags-list">
+              <!-- Injected via ClinicalApp.renderFlagsPanel() -->
+            </div>
+          </div>
+
+          <!-- Reminder & Care Schedule Panel (Doctor Configuration & Telemetry) -->
+          <div class="clinical-panel care-schedule-panel" id="care-schedule-panel">
+            <div class="panel-header">
+              <div>
+                <span class="panel-title">Care Schedule &amp; Adherence Protocol</span>
+                <span style="font-size: 0.6875rem; color: var(--color-brand-primary); font-weight: 600; margin-left: 8px;">(Doctor / ASHA Sync)</span>
+              </div>
+              <button id="btn-toggle-care-schedule" class="btn-text-subtle" style="font-size: 0.75rem; color: var(--color-brand-primary); font-weight: 600; cursor: pointer; background: none; border: none;">
+                Configure Schedule &darr;
+              </button>
+            </div>
+
+            <!-- Adherence Score Tiles (4 Categories) -->
+            <div class="reminder-categories-grid">
+              <div class="reminder-cat-box">
+                <span class="reminder-cat-label">Medicine</span>
+                <span id="rem-score-med" class="reminder-cat-score">0%</span>
+              </div>
+              <div class="reminder-cat-box">
+                <span class="reminder-cat-label">Hydration</span>
+                <span id="rem-score-hyd" class="reminder-cat-score">0%</span>
+              </div>
+              <div class="reminder-cat-box">
+                <span class="reminder-cat-label">Activity</span>
+                <span id="rem-score-act" class="reminder-cat-score">0%</span>
+              </div>
+              <div class="reminder-cat-box">
+                <span class="reminder-cat-label">Appointment</span>
+                <span id="rem-score-app" class="reminder-cat-score">0%</span>
+              </div>
+            </div>
+
+            <!-- Caregiver Emergency Escalation Alert Banner (Active when Missed Medicine Detected) -->
+            <div id="caregiver-sms-alert-banner" class="caregiver-sms-alert" style="display: none;">
+              <div class="caregiver-sms-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="caregiver-sms-badge">URGENT CAREGIVER TELE-ALERT (SMS)</span>
+                  <span class="mono-num" id="caregiver-sms-time" style="font-size: 0.6875rem; color: #9E382B;">Just Now</span>
+                </div>
+                <button id="btn-dismiss-caregiver-alert" class="btn-sms-dismiss" title="Acknowledge dispatch">Dismiss</button>
+              </div>
+              <div class="caregiver-sms-body">
+                <div class="caregiver-sms-recipient">
+                  <span>To: </span>
+                  <strong id="caregiver-sms-name">Pranab Hazarika (Son)</strong>
+                  <span class="mono-num" id="caregiver-sms-phone">(+91 94350-12890)</span>
+                </div>
+                <div class="caregiver-sms-msg" id="caregiver-sms-message">
+                  &ldquo;ALERT: Bhaben Chandra Hazarika missed morning dose of Donepezil 10mg (&gt;45m grace window expired). Please verify bedside pillbox or coordinate with ASHA worker Minati Kalita.&rdquo;
+                </div>
+              </div>
+              <div class="caregiver-sms-footer">
+                <span>Status: Dispatched via BSNL Regional Gateway</span>
+                <span>&bull; ASHA Dispatch: Notified</span>
+              </div>
+            </div>
+
+            <!-- Doctor Care Schedule Configuration Form (Pre-filled, Editable Anytime) -->
+            <div id="care-schedule-editor" class="care-schedule-editor">
+              <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-secondary); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span>Active Prescription Schedule</span>
+                <span style="font-size: 0.6875rem; color: var(--color-brand-primary); font-family: var(--font-mono); font-weight: normal;">Auto-syncs with Patient Tablet</span>
+              </div>
+
+              <!-- Morning Medicine Row -->
+              <div class="care-schedule-item">
+                <div class="care-schedule-pill-preview">
+                  <div class="pill-graphic pill-round-white" title="Donepezil 10mg Tablet">
+                    <span>DNP</span>
+                  </div>
+                </div>
+                <div class="care-schedule-fields">
+                  <div class="schedule-field-row">
+                    <div style="flex: 1;">
+                      <label class="schedule-label">Morning Medicine &amp; Dose</label>
+                      <input type="text" id="sched-med1-name" class="form-input schedule-input" value="Donepezil 10mg">
+                    </div>
+                    <div style="width: 85px;">
+                      <label class="schedule-label">Time</label>
+                      <input type="time" id="sched-med1-time" class="form-input schedule-input mono-num" value="08:30">
+                    </div>
+                  </div>
+                  <input type="text" id="sched-med1-instr" class="form-input schedule-input" style="font-size: 0.75rem; margin-top: 4px;" value="Take 1 tablet after morning tea with warm water">
+                </div>
+              </div>
+
+              <!-- Evening Medicine Row -->
+              <div class="care-schedule-item">
+                <div class="care-schedule-pill-preview">
+                  <div class="pill-graphic pill-oval-yellow" title="Memantine 10mg Tablet">
+                    <span>MEM</span>
+                  </div>
+                </div>
+                <div class="care-schedule-fields">
+                  <div class="schedule-field-row">
+                    <div style="flex: 1;">
+                      <label class="schedule-label">Evening Medicine &amp; Dose</label>
+                      <input type="text" id="sched-med2-name" class="form-input schedule-input" value="Memantine 10mg">
+                    </div>
+                    <div style="width: 85px;">
+                      <label class="schedule-label">Time</label>
+                      <input type="time" id="sched-med2-time" class="form-input schedule-input mono-num" value="20:00">
+                    </div>
+                  </div>
+                  <input type="text" id="sched-med2-instr" class="form-input schedule-input" style="font-size: 0.75rem; margin-top: 4px;" value="Take 1 tablet with post-dinner water">
+                </div>
+              </div>
+
+              <!-- Hydration & Activity Grid -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                <div>
+                  <label class="schedule-label">Hydration Frequency</label>
+                  <select id="sched-hyd-freq" class="form-select schedule-select">
+                    <option value="Every 2 Hours">Every 2 Hours (1000ml+)</option>
+                    <option value="Every 3 Hours" selected>Every 3 Hours (1500ml)</option>
+                    <option value="4 Times Daily">4 Times Daily (1200ml)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="schedule-label">Activity Prompt Time</label>
+                  <input type="time" id="sched-act-time" class="form-input schedule-input mono-num" value="10:00">
+                </div>
+              </div>
+
+              <!-- Follow-Up Appointment -->
+              <div style="margin-top: 8px;">
+                <label class="schedule-label">Next Clinical Review Appointment</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="date" id="sched-app-date" class="form-input schedule-input mono-num" value="2026-09-28" style="flex: 1;">
+                  <input type="text" id="sched-app-note" class="form-input schedule-input" value="GMCH Tele-Clinic Follow-up" style="flex: 2;">
+                </div>
+              </div>
+
+              <!-- Schedule Action Buttons -->
+              <div class="care-schedule-actions-bar">
+                <button id="btn-save-care-schedule" class="btn-clinical" style="padding: 6px 12px; font-size: 0.75rem;">
+                  <span>&check; Save &amp; Sync Care Schedule</span>
+                </button>
+                <button id="btn-test-patient-reminder" class="btn-clinical-secondary" style="padding: 6px 10px; font-size: 0.75rem;" title="Preview the patient's reminder interstitial">
+                  <span>&blacktriangleright; Patient App Preview</span>
+                </button>
+                <button id="btn-sim-missed-alert" class="btn-clinical-secondary" style="padding: 6px 10px; font-size: 0.75rem; color: var(--status-alert); border-color: var(--status-alert-border);" title="Simulate a missed medicine dose and trigger caregiver emergency SMS">
+                  <span>&#9888; Test Missed Alert</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Recent Logs List -->
+            <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-text-secondary); margin-top: 12px; margin-bottom: 6px;">
+              Recent Acknowledged &amp; Missed Logs
+            </div>
+            <div id="reminder-logs-list" class="reminder-log-list">
+              <!-- Injected via ClinicalApp.renderRemindersSection() -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- =========================================================================
+           CLINICAL PERFORMANCE REPORT (DOCTOR-ONLY COMPREHENSIVE INSTRUMENT)
+           ========================================================================= -->
+      <section class="clinical-performance-report-section" id="clinical-performance-report-section" aria-label="Clinical Performance Report">
+        
+        <!-- Report Masthead & Synchronized Controls -->
+        <div class="report-masthead">
+          <div class="report-masthead-titles">
+            <div class="report-confidential-pill">
+              <span class="report-confidential-dot"></span>
+              <span>CONFIDENTIAL MEDICAL RECORD • AUTHORIZED CLINICIAN ACCESS ONLY</span>
+            </div>
+            <h2 class="report-main-title">Clinical Cognitive Performance &amp; Longitudinal Evaluation Report</h2>
+            <p class="report-main-desc">
+              Structured multi-domain neuropsychological test battery history, decision latency biomarkers, and protocol adherence telemetry.
+            </p>
+          </div>
+
+          <!-- Synchronized Report Filter Controls -->
+          <div class="report-controls-bar">
+            <!-- Evaluation Date Range Selector -->
+            <div class="report-control-group">
+              <label class="report-control-label">Evaluation Window:</label>
+              <div class="report-range-toggle" role="group" aria-label="Report Date Range">
+                <button class="report-range-btn" data-range="7d">7 Days</button>
+                <button class="report-range-btn active" data-range="30d">30 Days</button>
+                <button class="report-range-btn" data-range="90d">90 Days</button>
+                <button class="report-range-btn" data-range="all">All-Time</button>
+              </div>
+            </div>
+
+            <!-- Game Category Filter -->
+            <div class="report-control-group">
+              <label for="report-domain-select" class="report-control-label">Domain Battery:</label>
+              <select id="report-domain-select" class="filter-select report-domain-select" aria-label="Filter report by game battery domain">
+                <option value="all">All 5 Battery Domains</option>
+                <option value="memory">Memory Match (Word &amp; Kin Recall)</option>
+                <option value="attention">Attention Spotter (Visual Cancellation)</option>
+                <option value="routineRecall">Daily Routine Sequencer (Dysexecutive)</option>
+                <option value="patternRecognition">Pattern &amp; Object Sort (Visuospatial)</option>
+                <option value="reminiscence">Recall &amp; Reminiscence (Facial Kinship)</option>
+              </select>
+            </div>
+
+            <!-- Export PDF Action Button -->
+            <button id="btn-export-report-pdf" class="btn-clinical btn-report-export" title="Export this clinical performance report as a formal medical referral PDF">
+              <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              <span>Export Report (PDF)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 1: OVERALL COGNITIVE SUMMARY -->
+        <div class="clinical-panel report-summary-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">1. Overall Cognitive Summary &amp; Domain Breakdown</span>
+              <span class="report-header-badge">Composite Neuro-Psychological Index</span>
+            </div>
+            <span id="report-eval-timestamp" class="report-meta-timestamp">Evaluated: Sep 14, 2026</span>
+          </div>
+
+          <div class="report-summary-grid">
+            <!-- Left: Donut Chart Container -->
+            <div id="report-cognitive-donut-container" class="report-donut-container">
+              <!-- Rendered via ClinicalCharts.renderReportCognitiveDonut() -->
+            </div>
+
+            <!-- Right: Plain Clinical Verdict Line & Clinical Domain Analysis -->
+            <div class="report-verdict-column">
+              <!-- Verdict Callout Box -->
+              <div id="report-verdict-box" class="report-verdict-box verdict-declining">
+                <div class="report-verdict-header">
+                  <span class="report-verdict-tag" id="report-verdict-tag">Declining Trajectory</span>
+                  <span class="report-verdict-window" id="report-verdict-window">30-Day Evaluation Window</span>
+                </div>
+                
+                <!-- Plain Clinical Verdict Line (Always with exact % change and window) -->
+                <div class="report-verdict-line" id="report-verdict-line">
+                  <strong>Declining:</strong> -14.2% change over 30 days (Baseline: 62.0% &rarr; Current: 47.8%)
+                </div>
+
+                <p class="report-verdict-explanation" id="report-verdict-explanation">
+                  Accelerated cognitive decay observed across consecutive testing cycles. Primary vulnerability localized to sustained visual attention speed and executive sequencing.
+                </p>
+              </div>
+
+              <!-- Domain Comparison Chips: Strongest vs Most Vulnerable -->
+              <div class="report-domain-comparison-grid">
+                <div class="report-domain-card domain-strongest">
+                  <div class="report-domain-card-label">Relatively Preserved Domain</div>
+                  <div class="report-domain-card-name" id="report-strongest-name">Routine Task Recall</div>
+                  <div class="report-domain-card-score" id="report-strongest-score">54% (Delta: -10%)</div>
+                  <div class="report-domain-card-note">Procedural memory shows highest relative preservation under familiar cueing.</div>
+                </div>
+
+                <div class="report-domain-card domain-weakest">
+                  <div class="report-domain-card-label">Most Vulnerable Domain</div>
+                  <div class="report-domain-card-name" id="report-weakest-name">Sustained Attention</div>
+                  <div class="report-domain-card-score" id="report-weakest-score">42% (Delta: -18%)</div>
+                  <div class="report-domain-card-note">Critical failure threshold reached; processing speed slowed by 420ms.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTIONS 2 & 3: DUAL ANALYTICAL CHARTS (Accuracy & Latency) -->
+        <div class="report-dual-charts-grid">
+          <!-- SECTION 2: PERFORMANCE OVER TIME (Bar + Trend combination) -->
+          <div class="clinical-panel report-chart-panel">
+            <div id="report-perf-chart-container">
+              <!-- Rendered via ClinicalCharts.renderReportPerformanceOverTime() -->
+            </div>
+            <div class="report-clinical-note-footer">
+              <strong>Clinical Reading Guide:</strong> Sage bars denote accuracy at/above baseline calibration; rust bars signify performance drops below baseline. Overlaid dark teal trendline displays the 3-session rolling average filter, dissociating transient daily fatigue from sustained neurodegenerative decline.
+            </div>
+          </div>
+
+          <!-- SECTION 3: RESPONSE-TIME & HESITATION ANALYSIS (Equal visual weight) -->
+          <div class="clinical-panel report-chart-panel">
+            <div id="report-latency-chart-container">
+              <!-- Rendered via ClinicalCharts.renderReportResponseTimeTrend() -->
+            </div>
+            <div class="report-clinical-note-footer">
+              <strong>Diagnostic Marker:</strong> Decision latency prolongation (&gt;3.0s threshold) frequently precedes manifest accuracy loss by 2&ndash;4 weeks. Persistent hesitation reflects subcortical processing decay or fronto-striatal disconnection syndrome.
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: ADHERENCE & ENGAGEMENT CONSISTENCY -->
+        <div class="clinical-panel report-adherence-panel">
+          <div id="report-adherence-chart-container">
+            <!-- Rendered via ClinicalCharts.renderReportAdherenceConsistency() -->
+          </div>
+          <div class="report-adherence-insight-bar">
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+              <span class="status-chip chip-attention" style="font-size: 0.6875rem;">Behavioral Flag</span>
+              <strong style="font-size: 0.8125rem; color: #1A2826;">Clinical Relevance of Engagement Consistency:</strong>
+            </div>
+            <p style="font-size: 0.75rem; color: #4B5A57; line-height: 1.45; margin-top: 4px;">
+              Session avoidance and skipped testing windows represent high-value clinical indicators of patient apathy, catastrophic reaction to difficulty, or progressive loss of procedural task initiation. A drop in weekly adherence necessitates immediate community health worker (ASHA) outreach.
+            </p>
+          </div>
+        </div>
+
+        <!-- SECTION 5: ALL-TIME TEST LOG (Structured Sortable Table) -->
+        <div class="clinical-panel report-table-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">5. Comprehensive Chronological Test Log (Raw Lab Telemetry)</span>
+              <span class="report-header-badge" id="report-table-count">17 Sessions Logged</span>
+            </div>
+            <div style="font-size: 0.6875rem; color: var(--color-text-muted); font-family: var(--font-mono);">
+              Click column headers to sort &bull; Synchronized with active filters
+            </div>
+          </div>
+
+          <div class="report-table-wrap">
+            <table class="report-test-table">
+              <thead>
+                <tr>
+                  <th class="report-th sortable-th active-sort" data-sort="date" tabindex="0" role="button">
+                    <span>Date</span> <span class="sort-glyph" id="sort-glyph-date">&darr;</span>
+                  </th>
+                  <th class="report-th" data-sort="game">
+                    <span>Cognitive Domain / Test</span>
+                  </th>
+                  <th class="report-th sortable-th" data-sort="duration" tabindex="0" role="button">
+                    <span>Duration</span> <span class="sort-glyph" id="sort-glyph-duration">&updownarrow;</span>
+                  </th>
+                  <th class="report-th sortable-th" data-sort="accuracy" tabindex="0" role="button">
+                    <span>Accuracy (%)</span> <span class="sort-glyph" id="sort-glyph-accuracy">&updownarrow;</span>
+                  </th>
+                  <th class="report-th sortable-th" data-sort="latency" tabindex="0" role="button">
+                    <span>Mean Latency (s)</span> <span class="sort-glyph" id="sort-glyph-latency">&updownarrow;</span>
+                  </th>
+                  <th class="report-th">
+                    <span>Difficulty Tier</span>
+                  </th>
+                  <th class="report-th sortable-th" data-sort="status" tabindex="0" role="button">
+                    <span>Clinical Status Tag</span> <span class="sort-glyph" id="sort-glyph-status">&updownarrow;</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="report-test-table-body">
+                <!-- Injected via ClinicalApp.renderReportTable() -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </section>
+
+    <!-- =========================================================================
+         VIEW 2B: CAREGIVER & FAMILY SUPPORT DASHBOARD
+         ========================================================================= -->
+    <section id="view-caregiver-dashboard" class="dashboard-view" aria-label="Caregiver Support Dashboard">
+      
+      <!-- Caregiver Top Header -->
+      <div class="caregiver-header-row">
+        <div class="caregiver-title-block">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: #EAF2ED; color: #2D7A58; border: 1px solid #BED9C8; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
+              Family &amp; Caregiver Portal
+            </span>
+          </div>
+          <h1 style="margin-top: 6px;">Caregiver &amp; Family Support Dashboard</h1>
+          <p>Longitudinal care coordination: daily medication adherence, mood tracking, activity logs, and reminder management.</p>
+        </div>
+
+        <div class="caregiver-header-actions">
+          <div style="display: flex; align-items: center; gap: 8px; background: var(--color-surface-subtle); padding: 6px 12px; border: 1px solid var(--color-border-subtle); border-radius: 4px;">
+            <label for="caregiver-patient-select" style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-secondary);">Monitoring Patient:</label>
+            <select id="caregiver-patient-select" class="filter-select" style="font-weight: 600; border: none; background: transparent; cursor: pointer;"></select>
+          </div>
+
+          <button id="btn-caregiver-view-game-analytics" class="btn-clinical" style="background: var(--color-brand-primary); color: #fff;" title="View Cognitive Game Analytics &amp; Reports for this patient">
+            <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            <span>Game Analytics &amp; Reports &rarr;</span>
+          </button>
+          <button id="btn-caregiver-notifications" class="btn-clinical-secondary" title="Enable browser push notifications for care alerts">
+            <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span id="btn-cg-notif-label">Enable Desktop Alerts</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Urgent Active Alert Banner (Shows when SOS or Missed Medication Exists) -->
+      <div id="caregiver-active-sos-banner" class="caregiver-sms-alert" style="display: none; margin-bottom: 24px; border-left: 5px solid #9E382B; background: #FFF2F0;">
+        <div class="caregiver-sms-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="caregiver-sms-badge" style="background: #9E382B; color: #fff;">CRITICAL SAFETY ALERT</span>
+            <span class="mono-num" id="cg-active-sos-time" style="font-size: 0.75rem; color: #9E382B;">Just Now</span>
+          </div>
+          <button id="btn-dismiss-active-sos" class="btn-sms-dismiss">Acknowledge &amp; Dismiss</button>
+        </div>
+        <div class="caregiver-sms-body">
+          <div id="cg-active-sos-content" style="font-size: 0.9375rem; color: #1A2826; font-weight: 600;">
+            Immediate assistance dispatch logged for patient.
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-Card Adherence & Care Summary Ribbon -->
+      <div class="cg-metrics-ribbon">
+        <!-- Tile 1: Medication Adherence -->
+        <div class="cg-stat-card">
+          <span class="cg-stat-label">Medication Adherence Rate</span>
+          <div class="cg-stat-value-row">
+            <span id="cg-metric-adherence" class="cg-stat-value">--%</span>
+            <span id="cg-adherence-chip" class="status-chip chip-stable">Evaluating</span>
+          </div>
+          <span class="cg-stat-sub" id="cg-adherence-sub">Based on 30-day scheduled doses</span>
+        </div>
+
+        <!-- Tile 2: Today's Reminders -->
+        <div class="cg-stat-card">
+          <span class="cg-stat-label">Today's Reminders</span>
+          <div class="cg-stat-value-row">
+            <span id="cg-metric-reminders" class="cg-stat-value">0</span>
+            <span style="font-size: 0.8125rem; font-weight: 600; color: var(--color-text-secondary);">Active</span>
+          </div>
+          <span class="cg-stat-sub" id="cg-metric-reminders-sub">0 completed · 0 upcoming</span>
+        </div>
+
+        <!-- Tile 3: Patient Mood Today -->
+        <div class="cg-stat-card">
+          <span class="cg-stat-label">Latest Patient Mood</span>
+          <div class="cg-stat-value-row">
+            <span id="cg-metric-mood" class="cg-stat-value" style="font-size: 1.5rem;">😌 Peaceful</span>
+          </div>
+          <span class="cg-stat-sub" id="cg-metric-mood-time">Logged via Patient Tablet</span>
+        </div>
+
+        <!-- Tile 4: Safety & Geo-Fence -->
+        <div class="cg-stat-card">
+          <span class="cg-stat-label">Safety &amp; Safe-Zone</span>
+          <div class="cg-stat-value-row">
+            <span id="cg-metric-safezone" class="cg-stat-value" style="font-size: 1.25rem; color: #2D7A58;">🟢 In Safe Zone</span>
+          </div>
+          <span class="cg-stat-sub" id="cg-metric-safezone-sub">Home Residence · 200m Geo-Fence</span>
+        </div>
+      </div>
+
+      <!-- Interactive Medication & Reminder CRUD Manager -->
+      <div class="cg-panel">
+        <div class="cg-panel-header">
+          <div>
+            <h2 class="cg-panel-title">
+              <span>💊</span>
+              <span>Care Schedule &amp; Medication Manager</span>
+            </h2>
+            <div style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-top: 2px;">
+              Create, edit, or remove patient care reminders. Changes automatically sync to the patient's tablet.
+            </div>
+          </div>
+          <button id="btn-open-add-reminder" class="btn-clinical" title="Add a new reminder for this patient">
+            <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>+ Add New Reminder</span>
+          </button>
+        </div>
+
+        <div class="cg-reminders-table-wrap">
+          <table class="cg-table" id="caregiver-reminders-table">
+            <thead>
+              <tr>
+                <th>Type &amp; Title</th>
+                <th>Category</th>
+                <th>Scheduled Time</th>
+                <th>Dosage / Target</th>
+                <th>Instructions</th>
+                <th>Status</th>
+                <th>Update Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="caregiver-reminders-tbody">
+              <!-- Dynamically populated via ClinicalApp.renderCaregiverReminders() -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 2-Column Row: Mood History & Activity Participation -->
+      <div class="detail-content-grid" style="margin-bottom: 24px;">
+        
+        <!-- Left Column: Patient Mood History Timeline -->
+        <div class="clinical-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">Patient Mood &amp; Emotional History</span>
+              <span style="font-size: 0.6875rem; color: var(--color-brand-primary); font-weight: 600; margin-left: 8px;">(Patient Self-Reports)</span>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);">Real-time Telemetry</span>
+          </div>
+
+          <div class="mood-timeline" id="caregiver-mood-timeline">
+            <!-- Dynamically populated via ClinicalApp.renderCaregiverMoodTimeline() -->
+          </div>
+        </div>
+
+        <!-- Right Column: Cognitive & Activity Participation -->
+        <div class="clinical-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">Cognitive &amp; Daily Activity Participation</span>
+              <span style="font-size: 0.6875rem; color: var(--color-text-secondary); margin-left: 8px;">(Supportive Tracking)</span>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--color-brand-primary); font-weight: 600;">Non-Judgmental</span>
+          </div>
+
+          <div id="caregiver-activity-list" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Dynamically populated via ClinicalApp.renderCaregiverActivityLog() -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Emergency Help & SOS Dispatches Log -->
+      <div class="cg-panel">
+        <div class="cg-panel-header">
+          <div>
+            <h2 class="cg-panel-title">
+              <span>🚨</span>
+              <span>Emergency Help &amp; Tele-Alert Dispatches Log</span>
+            </h2>
+            <div style="font-size: 0.8125rem; color: var(--color-text-secondary); margin-top: 2px;">
+              Chronological record of patient emergency SOS button triggers and SMS escalations.
+            </div>
+          </div>
+          <button id="btn-cg-test-sos" class="btn-clinical-secondary" title="Simulate a test SOS dispatch to verify alerts">
+            <span>🚨 Trigger Test SOS Alert</span>
+          </button>
+        </div>
+
+        <div id="caregiver-sos-logs-container">
+          <!-- Dynamically populated via ClinicalApp.renderCaregiverSOSLogs() -->
+        </div>
+      </div>
+
+      <!-- Medical Disclaimer & Legal Information Notice -->
+      <div class="medical-disclaimer-strip" role="note">
+        <svg class="disclaimer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M12 8v4m0 4h.01"/>
+        </svg>
+        <div>
+          <strong>Medical &amp; Care Companion Disclaimer:</strong>
+          This platform is an assistive care coordination and cognitive support companion engineered for the GMCH Regional Memory Unit. It is not an automated medical diagnostic tool and does not replace the judgment or emergency services of certified medical professionals. All clinical and caregiver data is encrypted and managed with patient and surrogate consent.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =========================================================================
+         VIEW 3: MULTI-PATIENT ANALYTICS OVERVIEW (SECONDARY VIEW)
+         ========================================================================= -->
+    <section id="view-analytics" class="dashboard-view" aria-label="Multi-Patient Analytics Overview">
+      
+      <div class="analytics-title-row">
+        <h1>Multi-Patient Analytics Overview</h1>
+        <p>Aggregate cognitive trajectories, regional distributions, and high-priority decline flags across district care clusters.</p>
+      </div>
+
+      <!-- Aggregate Stats Ribbon -->
+      <div class="analytics-ribbon">
+        <div class="stat-tile">
+          <span class="stat-tile-label">Total Registered Patients</span>
+          <span id="stat-total-patients" class="stat-tile-value">8</span>
+          <span class="stat-tile-sub">Active regional cluster</span>
+        </div>
+
+        <div class="stat-tile tile-stable">
+          <span class="stat-tile-label">Cohort Stability Rate</span>
+          <span id="stat-pct-stable" class="stat-tile-value" style="color: var(--status-stable);">38%</span>
+          <span class="stat-tile-sub">Maintenance trajectory</span>
+        </div>
+
+        <div class="stat-tile tile-attention">
+          <span class="stat-tile-label">Average Adherence Rate</span>
+          <span id="stat-avg-adherence" class="stat-tile-value" style="color: var(--status-attention);">75%</span>
+          <span class="stat-tile-sub">Medicine &amp; daily reminders</span>
+        </div>
+
+        <div class="stat-tile tile-alert">
+          <span class="stat-tile-label">Active Alerts This Week</span>
+          <span id="stat-active-alerts" class="stat-tile-value" style="color: var(--status-alert);">5</span>
+          <span class="stat-tile-sub">Requires clinician review</span>
+        </div>
+      </div>
+
+      <!-- Visual Breakdowns: Donut + District Bar Chart -->
+      <div class="analytics-charts-grid">
+        <div class="clinical-panel">
+          <div class="panel-header">
+            <span class="panel-title">Clinical Status Distribution</span>
+            <span style="font-size: 0.6875rem; color: var(--color-text-muted);">Muted Clinical Palette</span>
+          </div>
+          <div id="analytics-status-donut">
+            <!-- Injected via ClinicalCharts.renderStatusDonut() -->
+          </div>
+        </div>
+
+        <div class="clinical-panel">
+          <div class="panel-header">
+            <span class="panel-title">District Caseload Distribution (NER)</span>
+            <span style="font-size: 0.6875rem; color: var(--color-text-muted);">By Health Center Cluster</span>
+          </div>
+          <div id="analytics-district-bars">
+            <!-- Injected via ClinicalCharts.renderDistrictAnalyticsBar() -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Systemic Cluster AI Decline Telemetry Section -->
+      <div class="cluster-telemetry-grid">
+        <!-- Left: Active Flags by Severity & Domain Telemetry -->
+        <div class="clinical-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title">Cluster Cognitive Decline Telemetry</span>
+              <span class="ai-honest-framing-caption">AI-assisted pattern detection — not a diagnosis. Always confirm with clinical assessment.</span>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--color-text-secondary); background: var(--color-surface-subtle); padding: 2px 6px; border: 1px solid var(--color-border-subtle); border-radius: 2px;">
+              Active 14-Day Cycle
+            </span>
+          </div>
+
+          <!-- Active flags breakdown by severity -->
+          <div id="analytics-telemetry-severities" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); margin-bottom: var(--space-4);">
+            <!-- Dynamic Severity Cards: Alert, Needs Attention, Therapeutic Gain -->
+          </div>
+
+          <!-- Most commonly triggering modules across cluster -->
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--space-2); display: flex; justify-content: space-between;">
+              <span>Module Vulnerability Frequency (Cluster-Wide)</span>
+              <span style="color: var(--color-text-muted); font-size: 0.6875rem;">Flags Triggered This Month</span>
+            </div>
+            <div id="analytics-cluster-modules">
+              <!-- Cognitive module vulnerability bars injected dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Cluster Clinical Insight Callout & Systemic Vulnerability Summary -->
+        <div class="clinical-panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="panel-header">
+              <span class="panel-title">Systemic Clinical Decision Support</span>
+              <span style="font-size: 0.6875rem; color: var(--color-text-muted);">NER Cluster Trend</span>
+            </div>
+            <div id="analytics-systemic-insight-body">
+              <!-- Injected dynamically based on AIDeclineDetector.getClusterAnalytics() -->
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--color-border-subtle); padding-top: var(--space-3); margin-top: var(--space-3); font-size: 0.6875rem; color: var(--color-text-muted); line-height: 1.4;">
+            <strong style="color: var(--color-text-secondary); font-weight: 600;">Clinical Protocol Note:</strong> Cluster pattern shifts inform ASHA community worker home visit allocation and regional memory clinic triage schedules.
+          </div>
+        </div>
+      </div>
+
+      <!-- High-Priority Flagged Patients Queue -->
+      <div class="flagged-queue-panel">
+        <div class="panel-header">
+          <div>
+            <span class="panel-title">High-Priority Clinical Review Queue</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-secondary); margin-left: 8px;">
+              Patients flagged for cognitive decline or critical reminder non-adherence
+            </span>
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th>Patient &amp; UHID</th>
+                <th>District</th>
+                <th>Status</th>
+                <th>Triggered Clinical Metric</th>
+                <th>Last Active</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="flagged-patients-tbody">
+              <!-- Injected via ClinicalApp.renderFlaggedPatientsTable() -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =========================================================================
+         VIEW 3B: PATIENT GAME ANALYTICS, PROGRESS TRACKING & REPORTS
+         ========================================================================= -->
+    <section id="view-game-analytics" class="dashboard-view" aria-label="Patient Cognitive Game Analytics, Progress Tracking &amp; Reports">
+      
+      <!-- 1. Header & Patient Context Card -->
+      <div class="ga-header-card">
+        <div class="ga-header-top">
+          <div class="ga-title-group">
+            <h1>Patient Cognitive Game Analytics &amp; Reports</h1>
+            <p>Observational tracking of patient activity, accuracy trajectories, response latencies, and longitudinal progress.</p>
+          </div>
+          <div class="ga-header-actions">
+            <div class="ga-patient-selector-wrap">
+              <label for="ga-patient-select">Patient:</label>
+              <select id="ga-patient-select" class="ga-patient-select" aria-label="Select Patient for Analytics"></select>
+            </div>
+            <button id="btn-ga-export-csv" class="btn-clinical-secondary" title="Export raw session telemetry as RFC 4180 CSV">
+              <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Export CSV</span>
+            </button>
+            <button id="btn-ga-generate-report" class="btn-clinical" style="background: var(--color-brand-primary); color: #fff;" title="Generate printable clinical or caregiver progress report">
+              <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>Generate Report (PDF)</span>
+            </button>
+            <button id="btn-ga-refresh" class="btn-clinical-secondary" title="Refresh analytics dataset">
+              <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Patient Demographics Strip -->
+        <div class="ga-patient-strip">
+          <div class="ga-patient-bio">
+            <div id="ga-patient-avatar" class="ga-patient-avatar">--</div>
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 8px;">
+                <span id="ga-patient-name" class="ga-patient-name">Patient Name</span>
+                <span id="ga-patient-id" class="mono-num" style="font-size: 0.8125rem; color: var(--color-text-muted);">#NER-0000-000</span>
+              </div>
+              <div id="ga-patient-demog" class="ga-patient-submeta">Age / Gender • Location • Diagnosis</div>
+            </div>
+          </div>
+          <div id="ga-patient-caregiver-info" class="ga-patient-caregiver">
+            <div>Caregiver: <strong>--</strong></div>
+            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Contact: --</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Non-Diagnostic Observational Notice -->
+      <div class="ga-notice-banner" role="note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>
+          <strong>Observational Clinical Support Tool:</strong> Cognitive activity telemetry records session adherence and performance patterns to assist authorized caregivers and clinicians. It does not diagnose dementia, compute medical scores without clinical validation, or replace licensed medical evaluation.
+        </div>
+      </div>
+
+      <!-- 2. Time-Range Filter Bar -->
+      <div class="ga-time-filter-section" role="toolbar" aria-label="Analytics Time Filters">
+        <div class="ga-time-pills">
+          <button type="button" class="ga-time-pill" data-range="today">Today</button>
+          <button type="button" class="ga-time-pill" data-range="24h">Last 24 Hours</button>
+          <button type="button" class="ga-time-pill" data-range="7d">Last 7 Days</button>
+          <button type="button" class="ga-time-pill active" data-range="30d">Last 30 Days</button>
+          <button type="button" class="ga-time-pill" data-range="3m">Last 3 Months</button>
+          <button type="button" class="ga-time-pill" data-range="6m">Last 6 Months</button>
+          <button type="button" class="ga-time-pill" data-range="1y">Last 1 Year</button>
+          <button type="button" class="ga-time-pill" data-range="custom">Custom Range</button>
+        </div>
+
+        <div id="ga-custom-range-box" class="ga-custom-date-group" style="display: none;">
+          <label for="ga-custom-start">From:</label>
+          <input type="date" id="ga-custom-start" class="ga-date-input" />
+          <label for="ga-custom-end">To:</label>
+          <input type="date" id="ga-custom-end" class="ga-date-input" />
+          <button type="button" id="btn-ga-apply-custom" class="btn-clinical" style="padding: 4px 10px; font-size: 0.75rem;">Apply</button>
+        </div>
+
+        <div class="ga-filter-controls">
+          <span id="ga-grouping-indicator" class="ga-grouping-badge">Grouped by: Day</span>
+          <button type="button" id="btn-ga-reset-filters" class="btn-reset-filters" title="Reset all time and game filters to defaults">Reset Filters</button>
+        </div>
+      </div>
+
+      <!-- 3. Seven Summary Metric Cards Grid -->
+      <div class="ga-metrics-grid" role="region" aria-label="Key Analytics Summary Metrics">
+        <!-- 1. Total Sessions -->
+        <div class="ga-metric-card">
+          <span class="ga-metric-label">Total Sessions</span>
+          <div class="ga-metric-val-row">
+            <span id="ga-stat-total-sessions" class="ga-metric-val">--</span>
+            <span class="ga-metric-unit">plays</span>
+          </div>
+          <span id="ga-stat-sessions-sub" class="ga-metric-sub">-- completed</span>
+        </div>
+
+        <!-- 2. Total Duration -->
+        <div class="ga-metric-card">
+          <span class="ga-metric-label">Engagement Time</span>
+          <div class="ga-metric-val-row">
+            <span id="ga-stat-total-duration" class="ga-metric-val">--</span>
+            <span class="ga-metric-unit">min</span>
+          </div>
+          <span id="ga-stat-avg-duration-sub" class="ga-metric-sub">-- min / session</span>
+        </div>
+
+        <!-- 3. Overall Accuracy -->
+        <div class="ga-metric-card">
+          <span class="ga-metric-label">Mean Accuracy</span>
+          <div class="ga-metric-val-row">
+            <span id="ga-stat-mean-accuracy" class="ga-metric-val">--%</span>
+          </div>
+          <span id="ga-stat-accuracy-sub" class="ga-metric-sub">Across all activities</span>
+        </div>
+
+        <!-- 4. Completion Rate -->
+        <div class="ga-metric-card">
+          <span class="ga-metric-label">Completion Rate</span>
+          <div class="ga-metric-val-row">
+            <span id="ga-stat-completion-rate" class="ga-metric-val">--%</span>
+          </div>
+          <span id="ga-stat-completion-sub" class="ga-metric-sub">-- partial / abandoned</span>
+        </div>
+
+        <!-- 5. Mean Latency -->
+        <div class="ga-metric-card">
+          <span class="ga-metric-label">Response Latency</span>
+          <div class="ga-metric-val-row">
+            <span id="ga-stat-mean-latency" class="ga-metric-val">--</span>
+            <span class="ga-metric-unit">sec</span>
+          </div>
+          <span class="ga-metric-sub">Target baseline: 2.5s</span>
+        </div>
+
+        <!-- 6. Favorite Game -->
+        <div class="ga-metric-card">
+          <span class="ga-metric-label">Most Frequent</span>
+          <div class="ga-metric-val-row">
+            <span id="ga-stat-favorite-game" class="ga-metric-val" style="font-size: 1.125rem; word-break: break-word;">--</span>
+          </div>
+          <span id="ga-stat-favorite-sub" class="ga-metric-sub">-- of sessions</span>
+        </div>
+
+        <!-- 7. Active Streak / Consistency -->
+        <div class="ga-metric-card">
+          <span class="ga-metric-label">Protocol Consistency</span>
+          <div class="ga-metric-val-row">
+            <span id="ga-stat-active-days" class="ga-metric-val">--</span>
+            <span class="ga-metric-unit">days</span>
+          </div>
+          <span id="ga-stat-streak-sub" class="ga-metric-sub">Active engagement</span>
+        </div>
+      </div>
+
+      <!-- 4. Observational Progress Narrative Card -->
+      <div class="ga-narrative-card">
+        <div class="ga-narrative-header">
+          <div class="ga-narrative-title">Observational Longitudinal Summary</div>
+          <span class="ga-narrative-badge">Clinical &amp; Caregiver Review</span>
+        </div>
+        <p id="ga-narrative-text" class="ga-narrative-body">
+          Evaluating patient-specific activity and accuracy patterns for the selected period...
+        </p>
+      </div>
+
+      <!-- 5. 8-Chart Visual Grid -->
+      <div class="ga-charts-grid">
+        <!-- Chart 1: Completion Status Donut -->
+        <div class="ga-chart-card">
+          <div class="ga-chart-header">
+            <div class="ga-chart-title">Session Completion Status</div>
+            <div class="ga-chart-subtitle">Completed, Partially Completed, Abandoned &amp; Skipped Sessions</div>
+          </div>
+          <div id="ga-chart-completion"></div>
+        </div>
+
+        <!-- Chart 2: Response Breakdown Donut -->
+        <div class="ga-chart-card">
+          <div class="ga-chart-header">
+            <div class="ga-chart-title">Response Telemetry Breakdown</div>
+            <div class="ga-chart-subtitle">Correct vs. Incorrect Attempts Across All Cognitive Activities</div>
+          </div>
+          <div id="ga-chart-response"></div>
+        </div>
+
+        <!-- Chart 3: Domain Participation Donut -->
+        <div class="ga-chart-card">
+          <div class="ga-chart-header">
+            <div class="ga-chart-title">Cognitive Domain Distribution</div>
+            <div class="ga-chart-subtitle">Session Volume by Neurological Subdomain Protocol</div>
+          </div>
+          <div id="ga-chart-domain"></div>
+        </div>
+
+        <!-- Chart 4: Game Accuracy Comparison Bar -->
+        <div class="ga-chart-card">
+          <div class="ga-chart-header">
+            <div class="ga-chart-title">Activity-by-Activity Mean Accuracy</div>
+            <div class="ga-chart-subtitle">Mean Performance Against 75% Baseline Threshold</div>
+          </div>
+          <div id="ga-chart-game-accuracy"></div>
+        </div>
+
+        <!-- Chart 5: Session Frequency Bar -->
+        <div class="ga-chart-card">
+          <div class="ga-chart-header">
+            <div class="ga-chart-title">Session Frequency Over Time</div>
+            <div class="ga-chart-subtitle">Completed vs. Early-Exit Sessions by Interval</div>
+          </div>
+          <div id="ga-chart-frequency"></div>
+        </div>
+
+        <!-- Chart 6: Accuracy Trajectory Line -->
+        <div class="ga-chart-card">
+          <div class="ga-chart-header">
+            <div class="ga-chart-title">Accuracy Trajectory Over Time</div>
+            <div class="ga-chart-subtitle">Longitudinal Progression Curve with 75% Target Reference</div>
+          </div>
+          <div id="ga-chart-accuracy-line"></div>
+        </div>
+
+        <!-- Chart 7: Duration Trajectory Line -->
+        <div class="ga-chart-card">
+          <div class="ga-chart-header">
+            <div class="ga-chart-title">Session Duration Trajectory</div>
+            <div class="ga-chart-subtitle">Minutes Spent in Active Cognitive Engagement</div>
+          </div>
+          <div id="ga-chart-duration-line"></div>
+        </div>
+
+        <!-- Chart 8: Response Latency Trajectory Line -->
+        <div class="ga-chart-card">
+          <div class="ga-chart-header">
+            <div class="ga-chart-title">Response Latency Trajectory</div>
+            <div class="ga-chart-subtitle">Average Processing Latency (Seconds per Decision)</div>
+          </div>
+          <div id="ga-chart-latency-line"></div>
+        </div>
+      </div>
+
+      <!-- 6. Chronological Game History Table -->
+      <div class="ga-history-card">
+        <div class="ga-history-header">
+          <div>
+            <h2>Chronological Game Session History</h2>
+            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Detailed audit log of individual cognitive sessions with caregiver/doctor notes</div>
+          </div>
+          <div id="ga-history-count-badge" class="ga-grouping-badge">0 sessions</div>
+        </div>
+
+        <!-- Filter and Sort Controls -->
+        <div class="ga-history-controls" role="search" aria-label="Session History Filters">
+          <div class="ga-filter-item">
+            <label for="ga-filter-domain">Domain:</label>
+            <select id="ga-filter-domain" class="ga-history-select">
+              <option value="all">All Domains</option>
+              <option value="Memory">Memory</option>
+              <option value="Executive Function">Executive Function</option>
+              <option value="Attention">Attention</option>
+              <option value="Pattern Recognition">Pattern Recognition</option>
+              <option value="Reminiscence">Reminiscence</option>
+            </select>
+          </div>
+
+          <div class="ga-filter-item">
+            <label for="ga-filter-status">Status:</label>
+            <select id="ga-filter-status" class="ga-history-select">
+              <option value="all">All Statuses</option>
+              <option value="completed">Completed</option>
+              <option value="partially_completed">Partially Completed</option>
+              <option value="abandoned">Abandoned</option>
+            </select>
+          </div>
+
+          <div class="ga-filter-item">
+            <label for="ga-filter-tier">Difficulty:</label>
+            <select id="ga-filter-tier" class="ga-history-select">
+              <option value="all">All Tiers</option>
+              <option value="1">Tier 1 (Easy)</option>
+              <option value="2">Tier 2 (Moderate)</option>
+              <option value="3">Tier 3 (Challenging)</option>
+            </select>
+          </div>
+
+          <div class="ga-filter-item">
+            <label for="ga-filter-acc">Accuracy:</label>
+            <select id="ga-filter-acc" class="ga-history-select">
+              <option value="all">All Scores</option>
+              <option value="high">&ge; 75% (Target)</option>
+              <option value="mid">55% - 74% (Moderate)</option>
+              <option value="low">&lt; 55% (Needs Review)</option>
+            </select>
+          </div>
+
+          <div class="ga-filter-item" style="flex: 1; min-width: 180px;">
+            <label for="ga-filter-search">Search:</label>
+            <input type="search" id="ga-filter-search" class="ga-search-input" placeholder="Game name or note text..." aria-label="Search game sessions" />
+          </div>
+
+          <div class="ga-filter-item">
+            <label for="ga-sort-select">Sort:</label>
+            <select id="ga-sort-select" class="ga-history-select">
+              <option value="date-desc">Newest First</option>
+              <option value="date-asc">Oldest First</option>
+              <option value="acc-desc">Highest Accuracy</option>
+              <option value="acc-asc">Lowest Accuracy</option>
+              <option value="dur-desc">Longest Duration</option>
+              <option value="lat-asc">Fastest Latency</option>
+            </select>
+          </div>
+
+          <button type="button" id="btn-clear-hist-filters" class="btn-reset-filters">Clear</button>
+        </div>
+
+        <!-- History Table -->
+        <div class="ga-history-table-holder">
+          <table class="ga-history-table" aria-label="Chronological Game Session History Table">
+            <thead>
+              <tr>
+                <th scope="col">Date &amp; Time</th>
+                <th scope="col">Activity Name</th>
+                <th scope="col">Domain</th>
+                <th scope="col">Difficulty</th>
+                <th scope="col" style="text-align: right;">Duration</th>
+                <th scope="col" style="text-align: right;">Accuracy</th>
+                <th scope="col" style="text-align: right;">Latency</th>
+                <th scope="col">Status</th>
+                <th scope="col">Clinical / Caregiver Note</th>
+                <th scope="col" style="text-align: right;">Inspect</th>
+              </tr>
+            </thead>
+            <tbody id="ga-history-tbody">
+              <tr>
+                <td colspan="10" style="text-align: center; padding: 24px; color: var(--color-text-muted);">
+                  Loading patient session history...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Bar -->
+        <div class="ga-pagination-bar">
+          <div id="ga-page-info">Showing 0 of 0 sessions</div>
+          <div class="ga-page-buttons">
+            <button type="button" id="btn-ga-page-prev" class="btn-page-step" disabled>&larr; Previous</button>
+            <span id="ga-page-current-label" style="font-family: var(--font-mono); font-weight: 600; padding: 0 4px;">Page 1</span>
+            <button type="button" id="btn-ga-page-next" class="btn-page-step" disabled>Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 7. Session Detail Drawer / Modal -->
+    <div id="ga-session-detail-modal" class="ga-drawer-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="ga-drawer-session-title">
+      <div class="ga-drawer-card">
+        <div class="ga-drawer-header">
+          <div>
+            <h2 id="ga-drawer-session-title" class="ga-drawer-title">Session Telemetry Details</h2>
+            <div id="ga-drawer-session-subtitle" style="font-size: 0.75rem; color: var(--color-text-muted);">Session ID: --</div>
+          </div>
+          <button type="button" id="btn-close-session-drawer" class="btn-close-drawer" aria-label="Close session details">&times;</button>
+        </div>
+
+        <!-- Telemetry Details Grid -->
+        <div class="ga-telemetry-grid">
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Cognitive Activity</span>
+            <div id="ga-tile-game-name" class="ga-telemetry-tile-val" style="font-size: 0.9375rem;">--</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Cognitive Domain</span>
+            <div id="ga-tile-domain" class="ga-telemetry-tile-val" style="font-size: 0.9375rem;">--</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Protocol Tier</span>
+            <div id="ga-tile-tier" class="ga-telemetry-tile-val">--</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Accuracy Score</span>
+            <div id="ga-tile-accuracy" class="ga-telemetry-tile-val">--%</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Duration</span>
+            <div id="ga-tile-duration" class="ga-telemetry-tile-val">--</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Response Latency</span>
+            <div id="ga-tile-latency" class="ga-telemetry-tile-val">--s</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Correct / Attempted</span>
+            <div id="ga-tile-correct-attempts" class="ga-telemetry-tile-val">--</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Hints Used</span>
+            <div id="ga-tile-hints" class="ga-telemetry-tile-val">--</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Completion Status</span>
+            <div id="ga-tile-status" class="ga-telemetry-tile-val" style="font-size: 0.875rem;">--</div>
+          </div>
+          <div class="ga-telemetry-tile">
+            <span class="ga-telemetry-tile-label">Device Type</span>
+            <div id="ga-tile-device" class="ga-telemetry-tile-val" style="font-size: 0.875rem;">--</div>
+          </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="ga-notes-section">
+          <div style="font-weight: 600; font-size: 0.875rem; color: var(--color-text-primary);">
+            Caregiver &amp; Clinician Session Notes
+          </div>
+          <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 2px;">
+            Document behavioral observations, engagement context, or caregiver support notes for this session.
+          </div>
+
+          <textarea id="ga-session-note-input" class="ga-notes-textarea" placeholder="Add observational note (e.g. Patient played with daughter; appeared calm and confident)..."></textarea>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span id="ga-note-save-status" style="font-size: 0.75rem; color: var(--status-stable);"></span>
+            <button type="button" id="btn-save-session-note" class="btn-clinical" style="padding: 6px 14px; font-size: 0.8125rem;">
+              Save Note
+            </button>
+          </div>
+
+          <!-- Existing Notes Audit List -->
+          <div id="ga-notes-history-holder" style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed #DDD8CB;">
+            <div style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 6px;">
+              Session Notes Log:
+            </div>
+            <div id="ga-notes-history-list" style="font-size: 0.8125rem; color: var(--color-text-primary);">
+              <em>No notes recorded for this session yet.</em>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Doctor & Caregiver Report Generator Modal -->
+    <div id="ga-report-modal" class="ga-drawer-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="ga-report-modal-title">
+      <div class="ga-report-modal-card">
+        <div class="ga-drawer-header">
+          <div>
+            <h2 id="ga-report-modal-title" class="ga-drawer-title">Generate Progress Report</h2>
+            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Create downloadable PDF or printable report for clinical team or family</div>
+          </div>
+          <button type="button" id="btn-close-report-modal" class="btn-close-drawer" aria-label="Close report dialog">&times;</button>
+        </div>
+
+        <div class="ga-report-field">
+          <label for="ga-report-target-patient">Report Patient:</label>
+          <input type="text" id="ga-report-target-patient" readonly class="ga-date-input" style="width: 100%; box-sizing: border-box; background: #FAF8F5;" />
+        </div>
+
+        <div class="ga-report-field">
+          <label for="ga-report-audience">Intended Audience:</label>
+          <select id="ga-report-audience" class="ga-history-select" style="width: 100%; box-sizing: border-box;">
+            <option value="clinician">Clinician / Doctor View (Technical &amp; Longitudinal Focus)</option>
+            <option value="caregiver">Family &amp; Caregiver View (Supportive &amp; Practical Guidance)</option>
+          </select>
+        </div>
+
+        <div class="ga-report-field">
+          <label for="ga-report-window">Report Reporting Window:</label>
+          <select id="ga-report-window" class="ga-history-select" style="width: 100%; box-sizing: border-box;">
+            <option value="30d">Last 30 Days (Standard Monitoring)</option>
+            <option value="7d">Last 7 Days (Recent Follow-up)</option>
+            <option value="3m">Last 3 Months (Quarterly Review)</option>
+            <option value="6m">Last 6 Months (Semi-annual Protocol)</option>
+            <option value="1y">Last 1 Year (Annual Longitudinal Summary)</option>
+          </select>
+        </div>
+
+        <div class="ga-report-field">
+          <label>Sections to Include:</label>
+          <div class="ga-report-checkbox-group">
+            <label><input type="checkbox" id="rep-sec-exec" checked /> Executive Observational Summary</label>
+            <label><input type="checkbox" id="rep-sec-metrics" checked /> Core Performance Telemetry &amp; Metrics</label>
+            <label><input type="checkbox" id="rep-sec-charts" checked /> Cognitive Domain Visualizations</label>
+            <label><input type="checkbox" id="rep-sec-breakdown" checked /> Activity-Specific Breakdown</label>
+            <label><input type="checkbox" id="rep-sec-notes" checked /> Caregiver &amp; Clinical Notes Log</label>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #ECE7DB;">
+          <button type="button" id="btn-report-cancel" class="btn-clinical-secondary">Cancel</button>
+          <button type="button" id="btn-report-print" class="btn-clinical" style="background: var(--color-brand-primary); color: #fff;">
+            Print / Save as PDF &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         VIEW 4: PATIENT INTAKE / RECORD-ENTRY FLOW (NEW / EDIT RECORD)
+         ========================================================================= -->
+    <section id="view-patient-intake" class="dashboard-view" aria-label="Patient Clinical Intake Form">
+      
+      <!-- Intake Header Bar with Title, Draft Indicator, and Quick Actions -->
+      <div class="intake-header-bar">
+        <div class="intake-title-group">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+            <button id="btn-intake-back" class="btn-back-roster" style="padding: 4px 10px; font-size: 0.75rem;">
+              &larr; Exit
+            </button>
+            <h1 id="intake-form-heading">Patient Clinical Intake Sheet</h1>
+          </div>
+          <p id="intake-form-subheading">Systematic record-entry for clinical monitoring under the NER Tele-Dementia Network.</p>
+        </div>
+
+        <div class="intake-status-actions">
+          <div class="draft-indicator">
+            <span class="draft-dot"></span>
+            <span id="intake-draft-text">Draft saved</span>
+          </div>
+          <button id="btn-cancel-intake-top" class="btn-clinical-secondary">Cancel</button>
+          <button id="btn-submit-intake-top" class="btn-clinical">
+            <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span id="intake-submit-top-text">Commit to Registry</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Two-Column Form Layout: Navigation Rail + Grouped Intake Sheet -->
+      <div class="intake-workspace-grid">
+        
+        <!-- Sticky Section Navigation Rail -->
+        <aside class="intake-nav-rail" aria-label="Intake Form Sections">
+          <div class="rail-title">Clinical Intake Sections</div>
+          <a href="#sec-identity" class="rail-step-link active" data-target="sec-identity">
+            <span class="rail-step-num">01.</span>
+            <span>Identity &amp; Demographics</span>
+          </a>
+          <a href="#sec-health" class="rail-step-link" data-target="sec-health">
+            <span class="rail-step-num">02.</span>
+            <span>Health &amp; Baseline</span>
+          </a>
+          <a href="#sec-care" class="rail-step-link" data-target="sec-care">
+            <span class="rail-step-num">03.</span>
+            <span>Care Network</span>
+          </a>
+          <a href="#sec-device" class="rail-step-link" data-target="sec-device">
+            <span class="rail-step-num">04.</span>
+            <span>Device &amp; Reminders</span>
+          </a>
+          <a href="#sec-consent" class="rail-step-link" data-target="sec-consent">
+            <span class="rail-step-num">05.</span>
+            <span>Consent &amp; Audit</span>
+          </a>
+        </aside>
+
+        <!-- Main Form Container -->
+        <form id="clinical-intake-form" class="intake-form-sheet" novalidate>
+          
+          <!-- Hidden mode & record ID -->
+          <input type="hidden" id="intake-mode" value="create">
+          <input type="hidden" id="intake-record-id" value="">
+
+          <!-- SECTION 1: IDENTITY -->
+          <fieldset id="sec-identity" class="intake-section-card">
+            <legend class="intake-section-header" style="width: 100%;">
+              <div>
+                <span class="section-num-tag">Section 01</span>
+                <h2 class="intake-section-title">Patient Identity &amp; Regional Demographics</h2>
+                <p class="intake-section-desc">Essential clinical identification and regional linguistic profile for game localization.</p>
+              </div>
+            </legend>
+
+            <!-- Row 1: Name, UHID, Age, Gender -->
+            <div class="form-row-2col">
+              <div class="form-field-group" id="group-patient-name">
+                <label for="intake-name" class="form-label">
+                  <span>Full Legal Name <span class="req-mark">*</span></span>
+                  <span class="sub-label">As per Aadhaar / Hospital Card</span>
+                </label>
+                <input type="text" id="intake-name" class="form-input" placeholder="e.g. Bhaben Chandra Hazarika" required>
+                <div class="field-error-msg">
+                  <svg class="clinical-icon" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>Patient full legal name is required.</span>
+                </div>
+              </div>
+
+              <div class="form-field-group">
+                <label for="intake-uhid" class="form-label">
+                  <span>Patient UHID (System Generated)</span>
+                  <span class="sub-label">Read-only institutional ID</span>
+                </label>
+                <input type="text" id="intake-uhid" class="form-input read-only" readonly value="NER-2026-301">
+              </div>
+            </div>
+
+            <!-- Row 2: Age, Gender, District, Village -->
+            <div class="form-row-3col">
+              <div class="form-field-group" id="group-patient-age">
+                <label for="intake-age" class="form-label">
+                  <span>Age (Years) <span class="req-mark">*</span></span>
+                </label>
+                <input type="number" id="intake-age" class="form-input" min="18" max="115" placeholder="e.g. 68" required>
+                <div class="field-error-msg">
+                  <svg class="clinical-icon" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>Enter a valid age (e.g. 68 years).</span>
+                </div>
+              </div>
+
+              <div class="form-field-group">
+                <label for="intake-gender" class="form-label">Gender</label>
+                <select id="intake-gender" class="form-select">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div class="form-field-group" id="group-patient-district">
+                <label for="intake-district" class="form-label">
+                  <span>District (NER) <span class="req-mark">*</span></span>
+                </label>
+                <select id="intake-district" class="form-select" required>
+                  <option value="">Select District...</option>
+                  <option value="Kamrup Metro (Assam)">Kamrup Metro (Assam)</option>
+                  <option value="Dimapur (Nagaland)">Dimapur (Nagaland)</option>
+                  <option value="East Khasi Hills (Meghalaya)">East Khasi Hills (Meghalaya)</option>
+                  <option value="Imphal West (Manipur)">Imphal West (Manipur)</option>
+                  <option value="Aizawl (Mizoram)">Aizawl (Mizoram)</option>
+                  <option value="Kohima (Nagaland)">Kohima (Nagaland)</option>
+                  <option value="Cachar / Silchar (Assam)">Cachar / Silchar (Assam)</option>
+                  <option value="Papum Pare (Arunachal Pradesh)">Papum Pare (Arunachal Pradesh)</option>
+                </select>
+                <div class="field-error-msg">
+                  <svg class="clinical-icon" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>Select an authorized regional district.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 3: Languages & Village -->
+            <div class="form-row-3col">
+              <div class="form-field-group">
+                <label for="intake-village" class="form-label">
+                  <span>Village / Locality / Ward</span>
+                  <span class="sub-label">Local settlement</span>
+                </label>
+                <input type="text" id="intake-village" class="form-input" placeholder="e.g. Chandmari / Mawlai / Uripok">
+              </div>
+
+              <div class="form-field-group" id="group-patient-language">
+                <label for="intake-language" class="form-label">
+                  <span>Primary Spoken Language <span class="req-mark">*</span></span>
+                  <span class="sub-label">Used for audio cues</span>
+                </label>
+                <select id="intake-language" class="form-select" required>
+                  <option value="">Select Primary Language...</option>
+                  <option value="Assamese">Assamese</option>
+                  <option value="Khasi">Khasi</option>
+                  <option value="Meiteilon (Manipuri)">Meiteilon (Manipuri)</option>
+                  <option value="Mizo">Mizo</option>
+                  <option value="Nagamese">Nagamese</option>
+                  <option value="Bengali">Bengali</option>
+                  <option value="Bodo">Bodo</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="English">English</option>
+                </select>
+                <div class="field-error-msg">
+                  <svg class="clinical-icon" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>Primary language must be designated.</span>
+                </div>
+              </div>
+
+              <div class="form-field-group">
+                <label for="intake-sec-language" class="form-label">
+                  <span>Secondary Language (Optional)</span>
+                </label>
+                <select id="intake-sec-language" class="form-select">
+                  <option value="None">None</option>
+                  <option value="English">English</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="Assamese">Assamese</option>
+                  <option value="Bengali">Bengali</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- SECTION 2: HEALTH CONTEXT -->
+          <fieldset id="sec-health" class="intake-section-card">
+            <legend class="intake-section-header" style="width: 100%;">
+              <div>
+                <span class="section-num-tag">Section 02</span>
+                <h2 class="intake-section-title">Baseline Health Context &amp; Accessibility Needs</h2>
+                <p class="intake-section-desc">Calibrates initial difficulty tiers and accessibility settings in the patient app (non-diagnostic baseline).</p>
+              </div>
+            </legend>
+
+            <!-- Cognitive baseline context -->
+            <div class="form-field-group" style="margin-bottom: var(--space-4);">
+              <label for="intake-baseline-stage" class="form-label">
+                <span>Known Baseline Cognitive Condition Stage</span>
+                <span class="sub-label">Used to calibrate starting module difficulty tiers</span>
+              </label>
+              <select id="intake-baseline-stage" class="form-select" style="max-width: 480px;">
+                <option value="Early">Early / Mild Cognitive Impairment (Starts at Tier 2–3)</option>
+                <option value="Moderate">Moderate Impairment (Starts at Tier 1–2 with assistive cues)</option>
+                <option value="Advanced">Advanced Impairment (Starts at Simplified Tier 1)</option>
+                <option value="Not yet assessed" selected>Not yet formally assessed (Adaptive diagnostic calibration)</option>
+              </select>
+            </div>
+
+            <!-- Accessibility checklist -->
+            <div class="form-field-group">
+              <label class="form-label">
+                <span>Known Physical &amp; Sensory Considerations</span>
+                <span class="sub-label">Directly sets touchscreen &amp; audio accessibility modes</span>
+              </label>
+              <div class="checklist-grid">
+                <label class="check-item-label">
+                  <input type="checkbox" name="phys-considerations" value="low_vision">
+                  <div class="check-text-wrap">
+                    <span class="check-title">Low Vision / Visual Impairment</span>
+                    <span class="check-effect">Applies 130% UI scaling, bold high-contrast contours</span>
+                  </div>
+                </label>
+
+                <label class="check-item-label">
+                  <input type="checkbox" name="phys-considerations" value="hearing">
+                  <div class="check-text-wrap">
+                    <span class="check-title">Hearing Difficulty</span>
+                    <span class="check-effect">Replaces chime alerts with visual screen-edge pulses</span>
+                  </div>
+                </label>
+
+                <label class="check-item-label">
+                  <input type="checkbox" name="phys-considerations" value="mobility">
+                  <div class="check-text-wrap">
+                    <span class="check-title">Limited Physical Mobility</span>
+                    <span class="check-effect">Calibrates sedentary-safe activity reminders</span>
+                  </div>
+                </label>
+
+                <label class="check-item-label">
+                  <input type="checkbox" name="phys-considerations" value="tremor">
+                  <div class="check-text-wrap">
+                    <span class="check-title">Tremor / Fine-Motor Difficulty</span>
+                    <span class="check-effect">Expands touch button tap radius to 56px, ignores jitter</span>
+                  </div>
+                </label>
+
+                <label class="check-item-label" style="grid-column: 1/-1;">
+                  <input type="checkbox" name="phys-considerations" value="none" id="chk-phys-none">
+                  <div class="check-text-wrap">
+                    <span class="check-title">None reported</span>
+                    <span class="check-effect">Standard cognitive interaction parameters</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- SECTION 3: CARE NETWORK -->
+          <fieldset id="sec-care" class="intake-section-card">
+            <legend class="intake-section-header" style="width: 100%;">
+              <div>
+                <span class="section-num-tag">Section 03</span>
+                <h2 class="intake-section-title">Care Network &amp; Supervisory Assignment</h2>
+                <p class="intake-section-desc">Designates attending medical staff, district field worker, and primary caregiver telemetry recipients.</p>
+              </div>
+            </legend>
+
+            <!-- Doctor and Health Worker -->
+            <div class="form-row-2col">
+              <div class="form-field-group">
+                <label for="intake-doctor" class="form-label">
+                  <span>Assigned Attending Clinician</span>
+                  <span class="sub-label">Authorized supervisory physician</span>
+                </label>
+                <input type="text" id="intake-doctor" class="form-input" value="Dr. Priyam Borah, MD (Neurology)">
+              </div>
+
+              <div class="form-field-group">
+                <label for="intake-hw" class="form-label">
+                  <span>Assigned Community Health Worker (ASHA / CHO)</span>
+                  <span class="sub-label">Primary field sync contact</span>
+                </label>
+                <select id="intake-hw" class="form-select">
+                  <option value="Minati Kalita (ASHA - Guwahati)">Minati Kalita (ASHA - Guwahati)</option>
+                  <option value="Keviphreno (CHO - Kohima)">Keviphreno (CHO - Kohima)</option>
+                  <option value="Ibanylla Nongrum (ASHA - Shillong)">Ibanylla Nongrum (ASHA - Shillong)</option>
+                  <option value="Thoibi Devi (ASHA - Imphal)">Thoibi Devi (ASHA - Imphal)</option>
+                  <option value="Lalengzami (CHO - Aizawl)">Lalengzami (CHO - Aizawl)</option>
+                  <option value="Anjali Paul (ASHA - Silchar)">Anjali Paul (ASHA - Silchar)</option>
+                  <option value="Yab Kapa (CHO - Naharlagun)">Yab Kapa (CHO - Naharlagun)</option>
+                  <option value="Unassigned / Regional Sub-Center">Unassigned / Regional Sub-Center</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Primary Caregiver -->
+            <div class="form-row-3col">
+              <div class="form-field-group" id="group-cg-name">
+                <label for="intake-cg-name" class="form-label">
+                  <span>Primary Caregiver Name <span class="req-mark">*</span></span>
+                </label>
+                <input type="text" id="intake-cg-name" class="form-input" placeholder="e.g. Pranab Hazarika" required>
+                <div class="field-error-msg">
+                  <svg class="clinical-icon" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>Caregiver name is required for supervision.</span>
+                </div>
+              </div>
+
+              <div class="form-field-group">
+                <label for="intake-cg-rel" class="form-label">Relationship to Patient</label>
+                <select id="intake-cg-rel" class="form-select">
+                  <option value="Spouse">Spouse</option>
+                  <option value="Son" selected>Son</option>
+                  <option value="Daughter">Daughter</option>
+                  <option value="Daughter-in-law">Daughter-in-law</option>
+                  <option value="Grandchild">Grandchild</option>
+                  <option value="Sibling">Sibling</option>
+                  <option value="Other Relative">Other Relative</option>
+                </select>
+              </div>
+
+              <div class="form-field-group" id="group-cg-phone">
+                <label for="intake-cg-phone" class="form-label">
+                  <span>Caregiver Contact Phone <span class="req-mark">*</span></span>
+                </label>
+                <input type="tel" id="intake-cg-phone" class="form-input" placeholder="e.g. +91 94350-12890" required>
+                <div class="field-error-msg">
+                  <svg class="clinical-icon" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>Valid phone number is required.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Secondary Caregiver (Optional) -->
+            <div class="form-row-2col">
+              <div class="form-field-group">
+                <label for="intake-sec-cg-name" class="form-label">
+                  <span>Secondary Caregiver Name (Optional)</span>
+                </label>
+                <input type="text" id="intake-sec-cg-name" class="form-input" placeholder="Emergency backup contact name">
+              </div>
+
+              <div class="form-field-group">
+                <label for="intake-sec-cg-phone" class="form-label">
+                  <span>Secondary Caregiver Phone (Optional)</span>
+                </label>
+                <input type="tel" id="intake-sec-cg-phone" class="form-input" placeholder="e.g. +91 98640-00000">
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- SECTION 4: DEVICE & ACCESS SETUP -->
+          <fieldset id="sec-device" class="intake-section-card">
+            <legend class="intake-section-header" style="width: 100%;">
+              <div>
+                <span class="section-num-tag">Section 04</span>
+                <h2 class="intake-section-title">Device Provisioning &amp; Reminder Schedule Setup</h2>
+                <p class="intake-section-desc">Configures hardware interface, offline caching protocols, and initial daily care reminders.</p>
+              </div>
+            </legend>
+
+            <!-- Device Type & Connectivity Context -->
+            <div class="form-row-2col">
+              <div class="form-field-group">
+                <label for="intake-device-type" class="form-label">
+                  <span>Hardware Device Type</span>
+                  <span class="sub-label">Device used for cognitive sessions</span>
+                </label>
+                <select id="intake-device-type" class="form-select">
+                  <option value="Shared Family Tablet" selected>Shared Family Tablet (Recommended for elderly)</option>
+                  <option value="Patient Personal Smartphone">Patient Personal Smartphone</option>
+                  <option value="Caregiver Smartphone">Caregiver Smartphone</option>
+                  <option value="Community Health Worker (ASHA) Field Tablet">Community Health Worker (ASHA) Field Tablet</option>
+                </select>
+              </div>
+
+              <div class="form-field-group">
+                <label for="intake-connectivity" class="form-label">
+                  <span>Connectivity Context in Locality</span>
+                  <span class="sub-label">Configures telemetry caching depth</span>
+                </label>
+                <select id="intake-connectivity" class="form-select">
+                  <option value="Reliable (Broadband / Stable 4G)">Reliable (Broadband / Stable 4G)</option>
+                  <option value="Intermittent (Fluctuating cellular, periodic hill disruptions)" selected>Intermittent (Fluctuating cellular, periodic hill disruptions)</option>
+                  <option value="Mostly Offline (Remote village, synchronizes during weekly ASHA visit)">Mostly Offline (Remote village, synchronizes during weekly ASHA visit)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Offline-first Notice Banner -->
+            <div class="connectivity-notice-banner">
+              <svg class="clinical-icon" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <div>
+                <strong>Offline-First Synchronization Active:</strong> Cognitive session scores and reminder compliance are securely stored on-device using encrypted local storage. When connectivity is interrupted by regional weather or terrain, data will automatically batch-sync to GMCH upon reconnecting.
+              </div>
+            </div>
+
+            <!-- Reminder Schedule Starting Point -->
+            <div style="margin-top: var(--space-4);">
+              <label class="form-label" style="margin-bottom: var(--space-2);">
+                <span>Initial Care Reminder Schedule (Doctor Configurable)</span>
+                <span class="sub-label">Sensible defaults pre-filled; adjust as clinically indicated</span>
+              </label>
+              
+              <div class="reminder-setup-grid">
+                <div class="form-field-group">
+                  <label for="intake-med-morning" class="form-label" style="font-size:0.6875rem;">Morning Medication</label>
+                  <input type="time" id="intake-med-morning" class="form-input" value="08:30">
+                </div>
+
+                <div class="form-field-group">
+                  <label for="intake-med-evening" class="form-label" style="font-size:0.6875rem;">Evening Medication</label>
+                  <input type="time" id="intake-med-evening" class="form-input" value="20:00">
+                </div>
+
+                <div class="form-field-group">
+                  <label for="intake-hydration-freq" class="form-label" style="font-size:0.6875rem;">Hydration Prompts</label>
+                  <select id="intake-hydration-freq" class="form-select">
+                    <option value="Every 2 Hours">Every 2 Hours (08:00–18:00)</option>
+                    <option value="Every 3 Hours" selected>Every 3 Hours (08:00–20:00)</option>
+                    <option value="Every 4 Hours">Every 4 Hours</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- SECTION 5: CONSENT & AUDIT TRAIL -->
+          <fieldset id="sec-consent" class="intake-section-card">
+            <legend class="intake-section-header" style="width: 100%;">
+              <div>
+                <span class="section-num-tag">Section 05</span>
+                <h2 class="intake-section-title">Clinical Consent &amp; Audit Verification</h2>
+                <p class="intake-section-desc">Institutional requirement under ICMR guidelines before active tele-monitoring begins.</p>
+              </div>
+            </legend>
+
+            <!-- Consent Checkbox -->
+            <div class="consent-agreement-box" id="group-consent-check">
+              <label class="consent-checkbox-label">
+                <input type="checkbox" id="intake-consent-check" required>
+                <div>
+                  <strong>Informed Consent Verification:</strong>
+                  I certify that written or verbal informed consent for cognitive performance tracking, automated decline alerting, and caregiver telemetry has been obtained from the patient and/or authorized legal surrogate under institutional clinical oversight.
+                </div>
+              </label>
+              <div class="field-error-msg" style="margin-left: 28px; margin-top: 6px;">
+                <svg class="clinical-icon" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>Consent verification is mandatory to enroll patient into active registry.</span>
+              </div>
+            </div>
+
+            <!-- Consent Metadata -->
+            <div class="form-row-2col">
+              <div class="form-field-group">
+                <label for="intake-consent-date" class="form-label">Date Consent Recorded</label>
+                <input type="date" id="intake-consent-date" class="form-input">
+              </div>
+
+              <div class="form-field-group">
+                <label for="intake-consent-by" class="form-label">
+                  <span>Consent Witness / Recorded By</span>
+                  <span class="sub-label">Clinician or field health worker</span>
+                </label>
+                <input type="text" id="intake-consent-by" class="form-input" value="Dr. Priyam Borah, MD (Neurology)">
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Bottom Action Buttons Bar -->
+          <div class="intake-actions-bar">
+            <button type="button" id="btn-cancel-intake-bottom" class="btn-clinical-secondary">
+              Cancel &amp; Discard
+            </button>
+
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">All fields validated against hospital registry standards</span>
+              <button type="submit" id="btn-submit-intake-bottom" class="btn-clinical">
+                <svg class="clinical-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <span id="intake-submit-bottom-text">Commit to Patient Registry</span>
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+    </section>
+
+    <!-- =========================================================================
+         VIEW 5: PATIENT COGNITIVE APP (UNIFIED SINGLE-HOST PORTAL)
+         ========================================================================= -->
+    <section id="view-patient-app" class="dashboard-view" aria-label="Patient Cognitive Games View">
+      
+      <!-- Caregiver / Clinician Simulation Assistance Bar -->
+      <div class="patient-app-sim-bar">
+        <div class="sim-bar-left">
+          <div class="sim-bar-status-chip">
+            <span class="sim-dot"></span>
+            <span>Patient Interface Active</span>
+          </div>
+          
+          <div class="sim-patient-select-wrap">
+            <label for="sim-patient-select" class="sim-label">Simulating Patient:</label>
+            <select id="sim-patient-select" class="sim-patient-select" aria-label="Select patient to simulate in patient app">
+              <!-- Dynamically populated with all 8 regional patients -->
+            </select>
+          </div>
+
+          <div id="sim-patient-meta-badge" class="sim-meta-badge">
+            <span id="sim-patient-lang">Assamese</span> • <span id="sim-patient-access">72px Touch Targets</span>
+          </div>
+        </div>
+
+        <div class="sim-bar-right">
+          <a id="sim-open-standalone" href="games.html?patient=NER-2024-081" target="_blank" class="btn-clinical-secondary" style="text-decoration:none; padding: 6px 12px; font-size: 0.75rem;" title="Open patient app in full external window">
+            <svg class="clinical-icon" width="12" height="12" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Open Dedicated Tab</span>
+          </a>
+          <button id="btn-return-doctor" class="btn-clinical" title="Return to Doctor Roster / Dashboard">
+            <svg class="clinical-icon" width="13" height="13" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>&larr; Return to Clinician Dashboard</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Seamless Embedded Patient App Frame -->
+      <div class="patient-app-frame-wrap">
+        <iframe id="patient-app-iframe" src="games.html?patient=NER-2024-081&embed=1" title="Patient Cognitive Games App" class="patient-app-iframe"></iframe>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- CAREGIVER ADD / EDIT REMINDER MODAL -->
+  <div id="modal-caregiver-add-reminder" class="cg-modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cg-modal-title">
+    <div class="cg-modal-card">
+      <div class="cg-modal-header">
+        <h2 id="cg-modal-title">Add Care Reminder</h2>
+        <button id="btn-close-reminder-modal" class="btn-sms-dismiss" style="font-size: 1.25rem; line-height: 1; padding: 4px 8px;" title="Close dialog">&times;</button>
+      </div>
+      <form id="form-caregiver-reminder" onsubmit="return false;">
+        <input type="hidden" id="cg-form-reminder-id" value="">
+        
+        <div class="cg-form-group">
+          <label for="cg-form-title">Reminder Title / Medicine Name <span style="color: #9E382B;">*</span></label>
+          <input type="text" id="cg-form-title" class="cg-form-input" placeholder="e.g., Donepezil 10mg or Afternoon Hydration" required>
+        </div>
+
+        <div class="cg-form-row">
+          <div class="cg-form-group">
+            <label for="cg-form-category">Category</label>
+            <select id="cg-form-category" class="cg-form-select">
+              <option value="medication">Medication</option>
+              <option value="hydration">Hydration</option>
+              <option value="routine">Routine &amp; Walk</option>
+              <option value="nutrition">Nutrition &amp; Meal</option>
+              <option value="activity">Cognitive Activity</option>
+            </select>
+          </div>
+
+          <div class="cg-form-group">
+            <label for="cg-form-time">Scheduled Time <span style="color: #9E382B;">*</span></label>
+            <input type="text" id="cg-form-time" class="cg-form-input" placeholder="e.g., 08:30 AM or 02:00 PM" required>
+          </div>
+        </div>
+
+        <div class="cg-form-row">
+          <div class="cg-form-group">
+            <label for="cg-form-dosage">Dosage / Target Amount</label>
+            <input type="text" id="cg-form-dosage" class="cg-form-input" placeholder="e.g., 10mg tablet or 250ml water">
+          </div>
+
+          <div class="cg-form-group">
+            <label for="cg-form-status">Initial Status</label>
+            <select id="cg-form-status" class="cg-form-select">
+              <option value="upcoming">Upcoming</option>
+              <option value="completed">Completed</option>
+              <option value="missed">Missed</option>
+              <option value="postponed">Postponed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="cg-form-group">
+          <label for="cg-form-instructions">Instructions for Patient / Helper</label>
+          <input type="text" id="cg-form-instructions" class="cg-form-input" placeholder="e.g., Take with a full glass of warm water after breakfast">
+        </div>
+
+        <div id="cg-form-error" style="color: #9E382B; font-size: 0.8125rem; margin-top: 6px; display: none;"></div>
+
+        <div class="cg-modal-footer">
+          <button type="button" id="btn-cancel-reminder-modal" class="btn-clinical-secondary">Cancel</button>
+          <button type="button" id="btn-save-reminder" class="btn-clinical">Save &amp; Sync to Tablet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CAREGIVER DELETE CONFIRMATION MODAL -->
+  <div id="modal-caregiver-delete-reminder" class="cg-modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cg-del-title">
+    <div class="cg-modal-card" style="max-width: 440px;">
+      <div class="cg-modal-header">
+        <h2 id="cg-del-title" style="color: #9E382B;">Remove Care Reminder</h2>
+      </div>
+      <input type="hidden" id="cg-delete-reminder-id" value="">
+      <p style="font-size: 0.875rem; color: var(--color-text-primary); line-height: 1.5; margin-bottom: 20px;">
+        Are you sure you want to remove <strong id="cg-delete-reminder-name">this reminder</strong>? It will be removed from the patient's tablet schedule.
+      </p>
+      <div class="cg-modal-footer">
+        <button type="button" id="btn-cancel-delete-modal" class="btn-clinical-secondary">Cancel</button>
+        <button type="button" id="btn-confirm-delete-reminder" class="btn-clinical" style="background: #9E382B; border-color: #7D281E;">Yes, Delete Reminder</button>
+      </div>
+    </div>
+  </div>
+  <!-- =========================================================================
+       DOCTOR CLINICAL PROFILE & REGISTRY STATION MODAL
+       ========================================================================= -->
+  <div id="modal-doctor-profile-backdrop" class="doctor-profile-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="doctor-profile-modal-title" style="display: none;">
+    <div class="doctor-profile-modal-card">
+      <div class="doctor-profile-modal-header">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div class="profile-header-avatar" id="modal-doc-avatar">PB</div>
+          <div>
+            <h2 id="doctor-profile-modal-title" class="profile-header-title">Dr. Priyam Borah, MD</h2>
+            <p id="doctor-profile-modal-subtitle" class="profile-header-subtitle">Senior Consultant • Unit 3 Neurology · GMCH Guwahati</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" id="btn-edit-doctor-profile" class="btn-profile-edit-toggle" title="Edit Clinical Profile Information">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <span id="btn-edit-doctor-profile-text">Edit Profile</span>
+          </button>
+          <button type="button" id="btn-close-doctor-profile" class="btn-profile-modal-close" aria-label="Close Doctor Profile">✕</button>
+        </div>
+      </div>
+
+      <!-- VIEW MODE -->
+      <div id="doctor-profile-view-mode" class="doctor-profile-modal-body">
+        <div class="profile-meta-grid">
+          <div class="profile-meta-cell">
+            <span class="meta-cell-label">Medical Registration / UHID</span>
+            <span id="modal-doc-uhid" class="meta-cell-val mono-num">NER-MD-4081</span>
+          </div>
+          <div class="profile-meta-cell">
+            <span class="meta-cell-label">Clinical Specialization</span>
+            <span id="modal-doc-spec" class="meta-cell-val">Geriatric Neurology &amp; Cognitive Decline</span>
+          </div>
+          <div class="profile-meta-cell">
+            <span class="meta-cell-label">Assigned Healthcare Facility</span>
+            <span id="modal-doc-facility" class="meta-cell-val">Gauhati Medical College Hospital (GMCH)</span>
+          </div>
+          <div class="profile-meta-cell">
+            <span class="meta-cell-label">Regional Registry Role</span>
+            <span id="modal-doc-role" class="meta-cell-val">Senior Attending Neurologist &amp; Unit 3 Head</span>
+          </div>
+          <div class="profile-meta-cell">
+            <span class="meta-cell-label">Contact Clinical Email</span>
+            <span id="modal-doc-email" class="meta-cell-val">dr.priyam.borah@gmch.assam.gov.in</span>
+          </div>
+          <div class="profile-meta-cell">
+            <span class="meta-cell-label">Station Hot-Line</span>
+            <span id="modal-doc-phone" class="meta-cell-val">+91 361 252 8701</span>
+          </div>
+        </div>
+
+        <div class="profile-station-status-strip">
+          <div class="station-status-indicator"></div>
+          <div>
+            <div class="station-status-title">Encrypted Clinical Station Session Active</div>
+            <div class="station-status-desc">All cognitive score evaluations, longitudinal regression trends, and caregiver logs are timestamped to this attending token.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT MODE FORM -->
+      <form id="doctor-profile-edit-mode" class="doctor-profile-modal-body" style="display: none;">
+        <div class="profile-edit-grid">
+          <div class="edit-input-group">
+            <label for="input-doc-name" class="edit-input-label">Clinician Full Name &amp; Degree</label>
+            <input type="text" id="input-doc-name" class="edit-input-field" required value="Dr. Priyam Borah, MD">
+          </div>
+          <div class="edit-input-group">
+            <label for="input-doc-subtitle" class="edit-input-label">Role Title &amp; Unit Subtitle</label>
+            <input type="text" id="input-doc-subtitle" class="edit-input-field" required value="Senior Consultant • Unit 3 Neurology · GMCH Guwahati">
+          </div>
+          <div class="edit-input-group">
+            <label for="input-doc-spec" class="edit-input-label">Clinical Specialization</label>
+            <input type="text" id="input-doc-spec" class="edit-input-field" required value="Geriatric Neurology &amp; Cognitive Decline">
+          </div>
+          <div class="edit-input-group">
+            <label for="input-doc-facility" class="edit-input-label">Healthcare Facility / Hospital</label>
+            <input type="text" id="input-doc-facility" class="edit-input-field" required value="Gauhati Medical College Hospital (GMCH)">
+          </div>
+          <div class="edit-input-group">
+            <label for="input-doc-role" class="edit-input-label">Regional Registry Role</label>
+            <input type="text" id="input-doc-role" class="edit-input-field" required value="Senior Attending Neurologist &amp; Unit 3 Head">
+          </div>
+          <div class="edit-input-group">
+            <label for="input-doc-uhid" class="edit-input-label">Medical Registration / UHID</label>
+            <input type="text" id="input-doc-uhid" class="edit-input-field" required value="NER-MD-4081">
+          </div>
+          <div class="edit-input-group">
+            <label for="input-doc-email" class="edit-input-label">Clinical Contact Email</label>
+            <input type="email" id="input-doc-email" class="edit-input-field" required value="dr.priyam.borah@gmch.assam.gov.in">
+          </div>
+          <div class="edit-input-group">
+            <label for="input-doc-phone" class="edit-input-label">Direct Station Phone</label>
+            <input type="text" id="input-doc-phone" class="edit-input-field" required value="+91 361 252 8701">
+          </div>
+        </div>
+
+        <div class="edit-form-action-row">
+          <button type="button" id="btn-cancel-edit-doc" class="btn-clinical-secondary">Cancel</button>
+          <button type="submit" id="btn-save-edit-doc" class="btn-clinical">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Save Profile</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="doctor-profile-modal-footer">
+        <button type="button" id="btn-dismiss-doctor-profile" class="btn-clinical-secondary" style="padding: 8px 18px;">Close</button>
+        <a href="/landing.html" class="btn-doctor-signout-stylish" style="padding: 9px 20px; font-size: 0.8125rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out of Station</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLINICAL TOAST NOTIFICATION -->
+  <div id="clinical-toast-msg" class="clinical-toast-msg" role="alert" aria-live="polite">
+    <svg class="clinical-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <span id="toast-msg-text">Clinical record updated.</span>
+  </div>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="js/data.js"></script>
+  <script src="js/games-data.js"></script>
+  <script src="js/ai-detection.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
